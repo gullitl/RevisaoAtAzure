@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using WebFabricante.Models;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace WebFabricante.Data
 {
@@ -12,6 +7,7 @@ namespace WebFabricante.Data
         public WebFabricanteContext (DbContextOptions<WebFabricanteContext> options)
             : base(options)
         {
+            Database.EnsureCreated();
         }
 
         public DbSet<WebFabricante.Models.Fabricante> Fabricante { get; set; }
