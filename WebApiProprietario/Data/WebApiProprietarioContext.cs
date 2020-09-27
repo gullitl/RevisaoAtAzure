@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using WebApiProprietario.Models;
 
 namespace WebApiProprietario.Data
@@ -12,8 +8,9 @@ namespace WebApiProprietario.Data
         public WebApiProprietarioContext (DbContextOptions<WebApiProprietarioContext> options)
             : base(options)
         {
+            Database.EnsureCreated();
         }
 
-        public DbSet<WebApiProprietario.Models.Proprietario> Proprietario { get; set; }
+        public DbSet<Proprietario> Proprietario { get; set; }
     }
 }
