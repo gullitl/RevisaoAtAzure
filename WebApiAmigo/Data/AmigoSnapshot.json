@@ -1,0 +1,37 @@
+[
+  {
+    "id": 1,
+    "nome": "Israel Adasanya",
+    "email": "isra@ufc.com"
+  },
+  {
+    "id": 2,
+    "nome": "Paulo Costa",
+    "email": "borrachinha@ufc.com"
+  },
+  {
+    "id": 3,
+    "nome": "Conor McGregor",
+    "email": "conor@ufc.com"
+  },
+  {
+    "id": 4,
+    "nome": "Jone Jones",
+    "email": "jone@ufc.com"
+  },
+  {
+    "id": 5,
+    "nome": "Daniel Cormier",
+    "email": "dc@ufc.com"
+  },
+  {
+    "id": 6,
+    "nome": "Nate Diaz",
+    "email": "diaz@ufc.com"
+  },
+  {
+    "id": 7,
+    "nome": "Anderson Silva",
+    "email": "spider@ufc.com"
+  }
+]

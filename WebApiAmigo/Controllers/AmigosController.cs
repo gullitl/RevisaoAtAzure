@@ -24,6 +24,13 @@ namespace WebApiAmigo.Controllers
         [HttpGet]
         public ActionResult<List<AmigoResponse>> Get()
         {
+            //if(!Context.Amigo.Any())
+            //{
+            //    List<Amigo> amigosnapshot = Context.GetAmigoSnapshot();
+            //    Context.Amigo.AddRange(amigosnapshot);
+            //    Context.SaveChanges();
+            //}
+
             var amigos = Context.Amigo.ToList();
 
             var response = Mapper.Map<List<AmigoResponse>>(amigos);
