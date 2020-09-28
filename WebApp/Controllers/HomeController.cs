@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Net.Http;
+using System.Threading.Tasks;
 using WebApp.Models;
-using WebApp.Models.Fabricante;
 using WebApp.Models.Home;
+using WebApp.Models.Pais;
 
 namespace WebApp.Controllers
 {
@@ -27,27 +26,28 @@ namespace WebApp.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var viewModel = new HomeIndexViewModel();
-
-            viewModel.QuantidadeCarros = 10;
-            viewModel.QuantidadeFabricantes = await ObterQuantidadeDeFabricantes();
-            viewModel.QuantidadeProprietarios = 10;
+            var viewModel = new HomeIndexViewModel
+            {
+                QuantidadeCarros = 10,
+                QuantidadeFabricantes = 100,
+                QuantidadeProprietarios = 10
+            };
 
             return View(viewModel);
         }
 
         private async Task<int> ObterQuantidadeDeFabricantes()
         {
-            var response = await _httpClient.GetAsync("api/fabricantes");
+            var response = await _httpClient.GetAsync("api/Pais");
 
             var contentString = await response.Content.ReadAsStringAsync();
 
-            var fabricantes = JsonConvert.DeserializeObject<List<FabricanteViewModel>>(contentString);
+            var fabricantes = JsonConvert.DeserializeObject<List<PaisView>>(contentString);
 
             return fabricantes.Count;
         }
 
-        public IActionResult Privacy()
+        public IActionResult Sobre()
         {
             return View();
         }

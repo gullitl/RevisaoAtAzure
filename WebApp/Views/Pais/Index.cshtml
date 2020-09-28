@@ -1,0 +1,41 @@
+﻿@model IEnumerable<WebApp.Models.Pais.PaisView>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Lista de Paises</h1>
+<br />
+<p>
+    <a asp-action="Create">Cadastrar</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Nome)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FotoBandeira)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var item in Model) {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Nome)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FotoBandeira)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.PaisId">Editar</a> |
+                    <a asp-action="Details" asp-route-id="@item.PaisId">Detalhes</a> |
+                    <a asp-action="Delete" asp-route-id="@item.PaisId">Excluir</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

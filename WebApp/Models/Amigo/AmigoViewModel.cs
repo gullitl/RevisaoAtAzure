@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace WebApp.Models.Amigo
+﻿namespace WebApp.Models.Amigo
 {
     public class AmigoViewModel
     {

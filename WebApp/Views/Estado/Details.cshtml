@@ -1,0 +1,37 @@
+﻿@model WebApp.Models.Estado.EstadoView
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Detalhes da Estado</h1>
+<br />
+
+<div>
+    <h4>Estado</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Nome)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Nome)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Pais)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Pais.Nome)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.FotoBandeira)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.FotoBandeira)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.EstadoId">Editar</a> |
+    <a asp-action="Index">Listar</a>
+</div>

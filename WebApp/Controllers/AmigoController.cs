@@ -11,6 +11,8 @@ namespace WebApp.Controllers
 {
     public class AmigoController : Controller
     {
+        HttpClient httpClient = new HttpClient();
+
         [HttpGet]
         public async Task<ActionResult> Index()
         {
@@ -75,6 +77,5 @@ namespace WebApp.Controllers
             return RedirectToAction(nameof(RelacionarAmigos), new { form.Amigo.Id });
         }
 
-        HttpClient httpClient = new HttpClient();
     }
 }
