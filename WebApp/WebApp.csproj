@@ -12,6 +12,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove="Views\Amigo\Details.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Views\Amigo\Details.cshtml" />
     <None Include="Views\Estado\Create.cshtml" />
     <None Include="Views\Estado\Delete.cshtml" />
     <None Include="Views\Estado\Details.cshtml" />
