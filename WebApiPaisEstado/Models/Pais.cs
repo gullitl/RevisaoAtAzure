@@ -7,7 +7,7 @@ namespace WebPaisEstado.Models
 {
     public class Pais
     {
-        public string PaisId { get; set; }
+        public string Id { get; set; }
         public string Nome { get; set; }
         public string FotoBandeira { get; set; }
         public List<Estado> Estados { get; set; }

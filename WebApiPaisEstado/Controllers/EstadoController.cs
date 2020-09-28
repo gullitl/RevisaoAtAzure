@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using WebPaisEstado.Data;
 using WebPaisEstado.Models;
 
@@ -19,7 +18,7 @@ namespace WebPaisEstado.Controllers
 
         // GET: api/estado
         [HttpGet()]
-        public async Task<ActionResult<IEnumerable<Estado>>> Get() => await _context.Estados.ToListAsync();
+        public async Task<ActionResult<IEnumerable<Estado>>> Get() => Ok(await _context.Estados.ToListAsync());
 
         // GET: api/estado/5
         [HttpGet("{id}")]
@@ -33,6 +32,28 @@ namespace WebPaisEstado.Controllers
             return estado;
         }
 
+        // POST: api/estado
+        // To protect from overposting attacks, enable the specific properties you want to bind to, for
+        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+        [HttpPost]
+        public async Task<ActionResult<Estado>> Post(Estado estado)
+        {
+            estado.Id = Guid.NewGuid().ToString();
+            _context.Estados.Add(estado);
+            try
+            {
+                await _context.SaveChangesAsync();
+                return CreatedAtAction("Get", new { id = estado.Id });
+            } catch(DbUpdateException)
+            {
+                if(await EstadoExists(estado.Id))
+                    return Conflict();
+                else
+                    throw;
+            }
+
+        }
+
         // PUT: api/estado
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
@@ -44,39 +65,16 @@ namespace WebPaisEstado.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                return CreatedAtAction("Get", new { id = estado.Id });
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!EstadoExists(estado.EstadoId))
+                if (!await EstadoExists(estado.Id))
                     return NotFound();
                 else
                     throw;
             }
 
-            return NoContent();
-        }
-
-        // POST: api/estado
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPost]
-        public async Task<ActionResult<Estado>> Post(Estado estado)
-        {
-            estado.EstadoId = Guid.NewGuid().ToString();
-            _context.Estados.Add(estado);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (EstadoExists(estado.EstadoId))
-                    return Conflict();
-                else
-                    throw;
-            }
-
-            return CreatedAtAction("Get", new { id = estado.EstadoId }, estado);
         }
 
         // DELETE: api/estado/5
@@ -96,6 +94,6 @@ namespace WebPaisEstado.Controllers
 
         // GET: api/estado/5/exists
         [HttpGet("{id}/exists")]
-        private bool EstadoExists(string id) => _context.Estados.Any(e => e.EstadoId == id);
+        public async Task<bool> EstadoExists(string id) => await _context.Estados.AnyAsync(e => e.Id == id);
     }
 }

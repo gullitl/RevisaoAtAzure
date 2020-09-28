@@ -1,0 +1,86 @@
+[
+  {
+    "id": "1c8db2f6-f83f-462f-aec0-171b7995ed94",
+    "nome": "Stephen",
+    "sobrenome": "Curry",
+    "email": "steph@nba.com",
+    "telefone": "55 47 98246973",
+    "dataNascimento": "2020-09-16T00:00:00",
+    "paisId": null,
+    "estadoId": null,
+    "foto": "lkjnfkkjnaka7894p2u-afgafjp9u8fja;",
+    "amigos": [
+      {
+        "id": "a0fb4eb7-acca-4cd0-835d-7696b8b71eb5",
+        "nome": "Randy",
+        "sobrenome": "Orton",
+        "email": "randy@wwe.com",
+        "telefone": "55 47 98246973",
+        "dataNascimento": "2020-09-16T00:00:00",
+        "paisId": null,
+        "estadoId": null,
+        "foto": "lkjnfkkjnaka7894p2u-afgahjfjp9u8fja;",
+        "amigos": null
+      },
+      {
+        "id": "cbe53f24-b3d6-434f-a85b-574971a34c14",
+        "nome": "Israel",
+        "sobrenome": "Israel",
+        "email": "isra@ufc.com",
+        "telefone": "55 47 98246973",
+        "dataNascimento": "2020-09-16T00:00:00",
+        "paisId": null,
+        "estadoId": null,
+        "foto": "lkjnfkkjnaka7894p2u-afgafjp9u8fja;",
+        "amigos": null
+      }
+    ]
+  },
+  {
+    "id": "9e721e3b-9d38-49d7-ac76-e37334507c7b",
+    "nome": "Ronaldinho",
+    "sobrenome": "Gaucho",
+    "email": "bruxo@fifa.com",
+    "telefone": "55 47 98246973",
+    "dataNascimento": "2020-09-16T00:00:00",
+    "paisId": null,
+    "estadoId": null,
+    "foto": "lkjnfkkjnaka7894p2u-afgahjfjp9u8fja;",
+    "amigos": [
+      {
+        "id": "1c8db2f6-f83f-462f-aec0-171b7995ed94",
+        "nome": "Stephen",
+        "sobrenome": "Curry",
+        "email": "steph@nba.com",
+        "telefone": "55 47 98246973",
+        "dataNascimento": "2020-09-16T00:00:00",
+        "paisId": null,
+        "estadoId": null,
+        "foto": "lkjnfkkjnaka7894p2u-afgafjp9u8fja;",
+        "amigos": null
+      }
+    ]
+  },
+  {
+    "id": "a0fb4eb7-acca-4cd0-835d-7696b8b71eb5",
+    "nome": "Randy",
+    "sobrenome": "Orton",
+    "email": "randy@wwe.com",
+    "telefone": "55 47 98246973",
+    "dataNascimento": "2020-09-16T00:00:00",
+    "paisId": null,
+    "estadoId": null,
+    "foto": "lkjnfkkjnaka7894p2u-afgahjfjp9u8fja;"
+  },
+  {
+    "id": "cbe53f24-b3d6-434f-a85b-574971a34c14",
+    "nome": "Israel",
+    "sobrenome": "Israel",
+    "email": "isra@ufc.com",
+    "telefone": "55 47 98246973",
+    "dataNascimento": "2020-09-16T00:00:00",
+    "paisId": null,
+    "estadoId": null,
+    "foto": "lkjnfkkjnaka7894p2u-afgafjp9u8fja;"
+  }
+]

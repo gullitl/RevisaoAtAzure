@@ -29,7 +29,7 @@ namespace WebApiAmigo.Controllers
         {
             if(!await _context.Amigos.AnyAsync())
             {
-                List<Amigo> amigosnapshot = _context.GetAmigoSnapshot();
+                IEnumerable<Amigo> amigosnapshot = _context.GetAmigoSnapshot();
                 _context.Amigos.AddRange(amigosnapshot);
                 _context.SaveChanges();
             }
@@ -38,11 +38,19 @@ namespace WebApiAmigo.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Amigo>>> Get() => Ok(await _context.Amigos.ToListAsync());
+        public async Task<ActionResult<IEnumerable<Amigo>>> Get() => Ok(await _context.Amigos.ToListAsync());
 
         // GET api/amigo/5
         [HttpGet("{id}")]
-        public async Task<ActionResult> Get(string id) => Ok(await _context.Amigos.FindAsync(id));
+        public async Task<ActionResult> Get(string id) 
+        {
+            Amigo amigo = await _context.Amigos.FindAsync(id);
+
+            if(amigo == null)
+                return NotFound();
+
+            return Ok(amigo); 
+        }
 
         // POST: api/amigo
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
@@ -58,7 +66,7 @@ namespace WebApiAmigo.Controllers
                 return CreatedAtAction("Get", new { id = amigo.Id });
             } catch(DbUpdateException)
             {
-                if(AmigoExists(amigo.Id))
+                if(await AmigoExists(amigo.Id))
                     return Conflict();
                 else
                     throw;
@@ -77,7 +85,7 @@ namespace WebApiAmigo.Controllers
                 return CreatedAtAction("Get", new { id = amigo.Id });
             } catch(DbUpdateConcurrencyException)
             {
-                if(!AmigoExists(amigo.Id))
+                if(!await AmigoExists(amigo.Id))
                     return NotFound();
                 else
                     throw;
@@ -122,7 +130,7 @@ namespace WebApiAmigo.Controllers
 
         // GET: api/amigo/5/exists
         [HttpGet("{id}/exists")]
-        public bool AmigoExists(string id) => _context.Amigos.Any(e => e.Id == id);
+        public async Task<bool> AmigoExists(string id) => await _context.Amigos.AnyAsync(e => e.Id == id);
     }
 
     

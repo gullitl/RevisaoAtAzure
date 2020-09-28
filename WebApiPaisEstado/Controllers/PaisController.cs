@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using WebPaisEstado.Data;
 using WebPaisEstado.Models;
@@ -19,7 +18,21 @@ namespace WebPaisEstado.Controllers
 
         // GET: api/pais/init
         [HttpGet]
-        public string Init() => "Iniciou WebApiPaisEstado";
+        public async Task<string> Init()
+        {
+            //if(!await _context.Paises.AnyAsync())
+            //{
+            //    IEnumerable<Pais> paissnapshot = _context.GetPaisSnapshot();
+            //    _context.Paises.AddRange(paissnapshot);
+
+            //    IEnumerable<Estado> estadonapshot = _context.GetEstadoSnapshot();
+            //    _context.Estados.AddRange(estadonapshot);
+
+            //    _context.SaveChanges();
+            //}
+
+            return "Iniciou WebApiPaisEstado";
+        }
 
         // GET: api/pais
         [HttpGet]
@@ -37,6 +50,28 @@ namespace WebPaisEstado.Controllers
             return pais;
         }
 
+        // POST: api/pais
+        // To protect from overposting attacks, enable the specific properties you want to bind to, for
+        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+        [HttpPost]
+        public async Task<ActionResult<Pais>> Post(Pais pais)
+        {
+            pais.Id = Guid.NewGuid().ToString();
+            _context.Paises.Add(pais);
+            try
+            {
+                await _context.SaveChangesAsync();
+                return CreatedAtAction("Get", new { id = pais.Id });
+            }
+            catch (DbUpdateException)
+            {
+                if (await PaisExists(pais.Id))
+                    return Conflict();
+                else
+                    throw;
+            }
+        }
+
         // PUT: api/pais
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
@@ -48,39 +83,15 @@ namespace WebPaisEstado.Controllers
             try
             {
                 await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
+                return CreatedAtAction("Get", new { id = pais.Id });
+            } catch(DbUpdateConcurrencyException)
             {
-                if (!PaisExists(pais.PaisId))
+                if(!await PaisExists(pais.Id))
                     return NotFound();
                 else
                     throw;
             }
 
-            return NoContent();
-        }
-
-        // POST: api/pais
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPost]
-        public async Task<ActionResult<Pais>> Post(Pais pais)
-        {
-            pais.PaisId = Guid.NewGuid().ToString();
-            _context.Paises.Add(pais);
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                if (PaisExists(pais.PaisId))
-                    return Conflict();
-                else
-                    throw;
-            }
-
-            return CreatedAtAction("Get", new { id = pais.PaisId }, pais);
         }
 
         // DELETE: api/pais/5
@@ -99,6 +110,6 @@ namespace WebPaisEstado.Controllers
 
         // GET: api/pais/5/exists
         [HttpGet("{id}/exists")]
-        private bool PaisExists(string id) => _context.Paises.Any(e => e.PaisId == id);
+        private async Task<bool> PaisExists(string id) => await _context.Paises.AnyAsync(e => e.Id == id);
     }
 }
