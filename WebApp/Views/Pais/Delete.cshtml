@@ -4,12 +4,11 @@
     ViewData["Title"] = "Delete";
 }
 
-<h1>Excluir Pais</h1>
+<h1>Exclusão do Pais</h1>
 <br />
 
 <h3>Você tem certeza que deseja excluir este Pais?</h3>
 <div>
-    <h4>Pais</h4>
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
@@ -29,6 +28,6 @@
     <form asp-action="Delete">
         <input type="hidden" asp-for="PaisId" />
         <input type="submit" value="Excluir" class="btn btn-danger" /> |
-        <a asp-action="Index">Listar</a>
+        <a asp-action="Index">Voltar à Lista</a>
     </form>
 </div>

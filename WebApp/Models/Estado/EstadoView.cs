@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using WebApp.Models.Pais;
 
 namespace WebApp.Models.Estado
@@ -23,8 +23,8 @@ namespace WebApp.Models.Estado
         [ForeignKey("Pais")]
         [DisplayName("Pais")]
         public string PaisId { get; set; }
+        
         [JsonIgnore]
-
         public IFormFile LogoFile { get; set; }
 
         [DisplayName("Bandeira")]
