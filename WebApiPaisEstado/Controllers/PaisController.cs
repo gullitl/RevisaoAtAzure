@@ -17,17 +17,17 @@ namespace WebPaisEstado.Controllers
 
         public PaisController(WebPaisEstadoContext context) => _context = context;
 
+        // GET: api/pais/init
+        [HttpGet]
+        public string Init() => "Iniciou WebApiPaisEstado";
+
         // GET: api/pais
         [HttpGet]
-        public string Init() => "Iniciou WebPaisEstado";
-
-        // GET: api/pais
-        [HttpGet("getall")]
-        public async Task<ActionResult<IEnumerable<Pais>>> GetPaises() => await _context.Paises.ToListAsync();
+        public async Task<ActionResult<IEnumerable<Pais>>> Get() => await _context.Paises.ToListAsync();
 
         // GET: api/pais/5
-        [HttpGet("getbyid/{id}")]
-        public async Task<ActionResult<Pais>> GetPais(string id)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Pais>> Get(string id)
         {
             Pais pais = await _context.Paises.FindAsync(id);
 
@@ -40,8 +40,8 @@ namespace WebPaisEstado.Controllers
         // PUT: api/pais
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPut("update")]
-        public async Task<IActionResult> PutPais(Pais pais)
+        [HttpPut]
+        public async Task<IActionResult> Put(Pais pais)
         {
             _context.Entry(pais).State = EntityState.Modified;
 
@@ -63,8 +63,8 @@ namespace WebPaisEstado.Controllers
         // POST: api/pais
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPost("create")]
-        public async Task<ActionResult<Pais>> PostPais(Pais pais)
+        [HttpPost]
+        public async Task<ActionResult<Pais>> Post(Pais pais)
         {
             pais.PaisId = Guid.NewGuid().ToString();
             _context.Paises.Add(pais);
@@ -80,12 +80,12 @@ namespace WebPaisEstado.Controllers
                     throw;
             }
 
-            return CreatedAtAction("GetPais", new { id = pais.PaisId }, pais);
+            return CreatedAtAction("Get", new { id = pais.PaisId }, pais);
         }
 
         // DELETE: api/pais/5
-        [HttpDelete("delete/{id}")]
-        public async Task<ActionResult<Pais>> DeletePais(string id)
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<Pais>> Delete(string id)
         {
             Pais pais = await _context.Paises.FindAsync(id);
             if (pais == null)
@@ -97,8 +97,8 @@ namespace WebPaisEstado.Controllers
             return pais;
         }
 
-        // GET: api/pais/exists/5
-        [HttpGet("exists/{id}")]
+        // GET: api/pais/5/exists
+        [HttpGet("{id}/exists")]
         private bool PaisExists(string id) => _context.Paises.Any(e => e.PaisId == id);
     }
 }

@@ -27,13 +27,15 @@ namespace WebApp
         {
             services.AddControllersWithViews();
 
+            services.AddSingleton<IServiceUpload, ServiceUpload>();
+
             services.AddHttpClient<IServiceHttpClientPaisEstado, ServiceHttpClientPaisEstado>(x => {
-                x.BaseAddress = new Uri("https://localhost:44358/");
+                x.BaseAddress = new Uri("https://localhost:44358/api/");
                 x.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             });
 
             services.AddHttpClient<IServiceHttpClientAmigo, ServiceHttpClientAmigo>(x => {
-                x.BaseAddress = new Uri("https://localhost:44395/");
+                x.BaseAddress = new Uri("https://localhost:44395/api/amigo");
                 x.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             });
 

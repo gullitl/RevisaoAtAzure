@@ -9,13 +9,9 @@ namespace WebApiAmigo.Data
     public class WebApiAmigoContext : DbContext
     {
         public WebApiAmigoContext (DbContextOptions<WebApiAmigoContext> options)
-            : base(options)
-        {
-            Database.EnsureCreated();
-        }
+            : base(options) => Database.EnsureCreated();
 
-        public DbSet<Amigo> Amigo { get; set; }
-        //public DbSet<AmigosRelacionado> AmigosRelacionados { get; set; }
+        public DbSet<Amigo> Amigos { get; set; }
 
 
         public List<Amigo> GetAmigoSnapshot() => JsonConvert.DeserializeObject<List<Amigo>>(File.ReadAllText(@"Data/AmigoSnapshot.json"));

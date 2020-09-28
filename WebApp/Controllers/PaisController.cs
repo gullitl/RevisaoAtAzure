@@ -1,8 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Storage;
-using Microsoft.Azure.Storage.Blob;
-using System;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Data.Entity.Infrastructure;
 using System.Net.Http;
@@ -15,14 +11,17 @@ namespace WebApp.Controllers
     public class PaisController : Controller
     {
         public readonly HttpClient _httpClient;
-        private readonly string paisRoute = "api/pais";
+        public readonly IServiceUpload _serviceUpload;
 
-        public PaisController(IServiceHttpClientPaisEstado httpClient) => _httpClient = httpClient.GetClient();
-
+        public PaisController(IServiceHttpClientPaisEstado httpClient, IServiceUpload serviceUpload)
+        {
+            _httpClient = httpClient.GetClient();
+            _serviceUpload = serviceUpload;
+        }
         // GET: Pais
         public async Task<IActionResult> Index()
         {
-            var response = await _httpClient.GetAsync($"{paisRoute}/getall");
+            var response = await _httpClient.GetAsync("pais");
             if(response.IsSuccessStatusCode) 
                 return View(await response.Content.ReadAsAsync<List<PaisView>>());
             else
@@ -35,7 +34,7 @@ namespace WebApp.Controllers
             if (id == null)
                 return NotFound();
 
-            var response = await _httpClient.GetAsync($"{paisRoute}/getbyid/{id}");
+            var response = await _httpClient.GetAsync($"pais/{id}");
             if(response.IsSuccessStatusCode) 
             {
                 var pais = await response.Content.ReadAsAsync<PaisView>();
@@ -64,9 +63,9 @@ namespace WebApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                var urlLogo = Upload(pais.LogoFile);
+                var urlLogo = _serviceUpload.Upload(pais.LogoFile);
                 pais.FotoBandeira = urlLogo;
-                HttpResponseMessage response = await _httpClient.PostAsJsonAsync($"{paisRoute}/create", pais);
+                HttpResponseMessage response = await _httpClient.PostAsJsonAsync($"pais", pais);
 
                 if(response.IsSuccessStatusCode)
                     return RedirectToAction(nameof(Index));
@@ -80,7 +79,7 @@ namespace WebApp.Controllers
             if (id == null)
                 return NotFound();
 
-            var response = await _httpClient.GetAsync($"{paisRoute}/getbyid/{id}");
+            var response = await _httpClient.GetAsync($"pais/{id}");
             if(response.IsSuccessStatusCode) 
             {
                 var pais = await response.Content.ReadAsAsync<PaisView>();
@@ -106,9 +105,9 @@ namespace WebApp.Controllers
             {
                 try
                 {
-                    var urlLogo = Upload(pais.LogoFile);
+                    var urlLogo = _serviceUpload.Upload(pais.LogoFile);
                     pais.FotoBandeira = urlLogo;
-                    await _httpClient.PutAsJsonAsync($"{paisRoute}/update", pais);
+                    await _httpClient.PutAsJsonAsync($"pais", pais);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -128,7 +127,7 @@ namespace WebApp.Controllers
             if (id == null)
                 return NotFound();
 
-            var response = await _httpClient.GetAsync($"{paisRoute}/getbyid/{id}");
+            var response = await _httpClient.GetAsync($"pais/{id}");
             if(response.IsSuccessStatusCode) 
             {
                 var pais = await response.Content.ReadAsAsync<PaisView>();
@@ -145,30 +144,19 @@ namespace WebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            await _httpClient.DeleteAsync($"{paisRoute}/delete/{id}");
+            await _httpClient.DeleteAsync($"pais{id}");
             return RedirectToAction(nameof(Index));
         }
 
         private async Task<bool> PaisExists(string id)
         {
-            var response = await _httpClient.GetAsync($"{paisRoute}/exists/{id}");
+            var response = await _httpClient.GetAsync($"pais/{id}/exists");
             if(response.IsSuccessStatusCode) 
             {
                 return await response.Content.ReadAsAsync<bool>();
             } else
                 return false;
         }
-        private string Upload(IFormFile logoFile)
-        {
-            var reader = logoFile.OpenReadStream();
-            var cloudStorageAccount = CloudStorageAccount.Parse(@"DefaultEndpointsProtocol=https;AccountName=hortananuvem;AccountKey=dJ5gWC6luF4EmaTy1F1HUPUIr0lK3faspJB6rajYfym8fgBZdDxi3x5aeRy0apnIrogIRWahJfghyRoERV26Hw==;EndpointSuffix=core.windows.net");
-            var blobClient = cloudStorageAccount.CreateCloudBlobClient();
-            var container = blobClient.GetContainerReference("post-images");
-            container.CreateIfNotExists();
-            var blob = container.GetBlockBlobReference(Guid.NewGuid().ToString());
-            blob.UploadFromStream(reader);
-            var destinoDaImagemNaNuvem = blob.Uri.ToString();
-            return destinoDaImagemNaNuvem;
-        }
+
     }
 }

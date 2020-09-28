@@ -18,12 +18,12 @@ namespace WebPaisEstado.Controllers
         public EstadoController(WebPaisEstadoContext context) => _context = context;
 
         // GET: api/estado
-        [HttpGet("getall")]
-        public async Task<ActionResult<IEnumerable<Estado>>> GetEstados() => await _context.Estados.ToListAsync();
+        [HttpGet()]
+        public async Task<ActionResult<IEnumerable<Estado>>> Get() => await _context.Estados.ToListAsync();
 
-        // GET: api/estado/getbyid/5
-        [HttpGet("getbyid/{id}")]
-        public async Task<ActionResult<Estado>> GetEstado(string id)
+        // GET: api/estado/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Estado>> Get(string id)
         {
             Estado estado = await _context.Estados.FindAsync(id);
 
@@ -36,8 +36,8 @@ namespace WebPaisEstado.Controllers
         // PUT: api/estado
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPut("update")]
-        public async Task<IActionResult> PutEstado(Estado estado)
+        [HttpPut]
+        public async Task<IActionResult> Put(Estado estado)
         {
             _context.Entry(estado).State = EntityState.Modified;
 
@@ -59,8 +59,8 @@ namespace WebPaisEstado.Controllers
         // POST: api/estado
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
-        [HttpPost("create")]
-        public async Task<ActionResult<Estado>> PostEstado(Estado estado)
+        [HttpPost]
+        public async Task<ActionResult<Estado>> Post(Estado estado)
         {
             estado.EstadoId = Guid.NewGuid().ToString();
             _context.Estados.Add(estado);
@@ -80,8 +80,8 @@ namespace WebPaisEstado.Controllers
         }
 
         // DELETE: api/estado/5
-        [HttpDelete("delete/{id}")]
-        public async Task<ActionResult<Estado>> DeleteEstado(string id)
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<Estado>> Delete(string id)
         {
             Estado estado = await _context.Estados.FindAsync(id);
 
@@ -94,8 +94,8 @@ namespace WebPaisEstado.Controllers
             return estado;
         }
 
-        // GET: api/estado/exists/5
-        [HttpGet("exists/{id}")]
+        // GET: api/estado/5/exists
+        [HttpGet("{id}/exists")]
         private bool EstadoExists(string id) => _context.Estados.Any(e => e.EstadoId == id);
     }
 }
