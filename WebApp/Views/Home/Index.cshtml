@@ -4,9 +4,19 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <p>Quantidades</p>
-    <p>Quantidade de fabricantes: @Model.QuantidadeFabricantes.</p>
-    <p>Quantidade de carros: @Model.QuantidadeCarros.</p>
-    <p>Quantidade de proprietarios: @Model.QuantidadeProprietarios.</p>
+<div class="text-left">
+    <h1>Quantidades</h1>
+    
+    <hr />
+    <div>Amigos 
+        <h4>@Model.QtdAmigos</h4>
+    </div>
+    <br />
+    <div>Paises 
+        <h4>@Model.QtdPaises</h4>
+    </div>
+    <br />
+    <div>Estados 
+        <h4>@Model.QtdEstados</h4>
+    </div>
 </div>

@@ -22,7 +22,6 @@ namespace WebPaisEstado.Data
             return JsonConvert.DeserializeObject<IEnumerable<Estado>>(File.ReadAllText(@"Data/EstadoSnapshot.json"));
         }
         public DbSet<Pais> Paises { get; set; }
-
         public DbSet<Estado> Estados { get; set; }
     }
 }

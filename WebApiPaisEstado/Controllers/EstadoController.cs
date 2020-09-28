@@ -29,7 +29,7 @@ namespace WebPaisEstado.Controllers
             if (estado == null)
                 return NotFound();
 
-            return estado;
+            return Ok(estado);
         }
 
         // POST: api/estado
@@ -43,7 +43,7 @@ namespace WebPaisEstado.Controllers
             try
             {
                 await _context.SaveChangesAsync();
-                return CreatedAtAction("Get", new { id = estado.Id });
+                return CreatedAtAction("Get", new { id = estado.Id }, estado);
             } catch(DbUpdateException)
             {
                 if(await EstadoExists(estado.Id))
@@ -65,7 +65,7 @@ namespace WebPaisEstado.Controllers
             try
             {
                 await _context.SaveChangesAsync();
-                return CreatedAtAction("Get", new { id = estado.Id });
+                return CreatedAtAction("Get", new { id = estado.Id }, estado);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -89,7 +89,7 @@ namespace WebPaisEstado.Controllers
             _context.Estados.Remove(estado);
             await _context.SaveChangesAsync();
 
-            return estado;
+            return Ok(estado);
         }
 
         // GET: api/estado/5/exists

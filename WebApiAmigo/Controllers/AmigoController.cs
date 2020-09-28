@@ -104,7 +104,7 @@ namespace WebApiAmigo.Controllers
             _context.Amigos.Remove(amigo);
             await _context.SaveChangesAsync();
 
-            return amigo;
+            return Ok(amigo);
         }
 
         [HttpGet("{id}/amigos")]

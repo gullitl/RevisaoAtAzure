@@ -17,26 +17,26 @@ namespace WebPaisEstado.Controllers
         public PaisController(WebPaisEstadoContext context) => _context = context;
 
         // GET: api/pais/init
-        [HttpGet]
+        [HttpGet("init")]
         public async Task<string> Init()
         {
-            //if(!await _context.Paises.AnyAsync())
-            //{
-            //    IEnumerable<Pais> paissnapshot = _context.GetPaisSnapshot();
-            //    _context.Paises.AddRange(paissnapshot);
+            if(!await _context.Paises.AnyAsync())
+            {
+                IEnumerable<Pais> paissnapshot = _context.GetPaisSnapshot();
+                _context.Paises.AddRange(paissnapshot);
 
-            //    IEnumerable<Estado> estadonapshot = _context.GetEstadoSnapshot();
-            //    _context.Estados.AddRange(estadonapshot);
+                IEnumerable<Estado> estadonapshot = _context.GetEstadoSnapshot();
+                _context.Estados.AddRange(estadonapshot);
 
-            //    _context.SaveChanges();
-            //}
+                _context.SaveChanges();
+            }
 
             return "Iniciou WebApiPaisEstado";
         }
 
         // GET: api/pais
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Pais>>> Get() => await _context.Paises.ToListAsync();
+        public async Task<ActionResult<IEnumerable<Pais>>> Get() => Ok(await _context.Paises.ToListAsync());
 
         // GET: api/pais/5
         [HttpGet("{id}")]
@@ -47,7 +47,7 @@ namespace WebPaisEstado.Controllers
             if (pais == null)
                 return NotFound();
 
-            return pais;
+            return Ok(pais);
         }
 
         // POST: api/pais
@@ -61,7 +61,7 @@ namespace WebPaisEstado.Controllers
             try
             {
                 await _context.SaveChangesAsync();
-                return CreatedAtAction("Get", new { id = pais.Id });
+                return CreatedAtAction("Get", new { id = pais.Id }, pais);
             }
             catch (DbUpdateException)
             {
@@ -83,7 +83,7 @@ namespace WebPaisEstado.Controllers
             try
             {
                 await _context.SaveChangesAsync();
-                return CreatedAtAction("Get", new { id = pais.Id });
+                return CreatedAtAction("Get", new { id = pais.Id }, pais);
             } catch(DbUpdateConcurrencyException)
             {
                 if(!await PaisExists(pais.Id))
@@ -105,7 +105,7 @@ namespace WebPaisEstado.Controllers
             _context.Paises.Remove(pais);
             await _context.SaveChangesAsync();
 
-            return pais;
+            return Ok(pais);
         }
 
         // GET: api/pais/5/exists

@@ -1,50 +1,69 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using WebApp.Models;
+using WebApp.Models.Amigo;
 using WebApp.Models.Home;
 using WebApp.Models.Pais;
+using WebApp.Services;
 
 namespace WebApp.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-        private readonly HttpClient _httpClient;
+        public readonly HttpClient _httpClientAmigo;
+        public readonly HttpClient _httpClientPaisEstado;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(IServiceHttpClientAmigo httpClientAmigo, 
+            IServiceHttpClientPaisEstado httpClientPaisEstado)
         {
-            _logger = logger;
-            _httpClient = new HttpClient();
-            _httpClient.BaseAddress = new Uri("http://localhost:61347");
+            _httpClientAmigo = httpClientAmigo.GetClient();
+            _httpClientPaisEstado = httpClientPaisEstado.GetClient();
         }
 
         public async Task<IActionResult> Index()
         {
             var viewModel = new HomeIndexViewModel
             {
-                QuantidadeCarros = 10,
-                QuantidadeFabricantes = 100,
-                QuantidadeProprietarios = 10
+                QtdAmigos = await GetQtdAmigos(),
+                QtdPaises = await GetQtdPaises(),
+                QtdEstados = await GetQtdEstados()
             };
 
-            return View(viewModel);
+            if(viewModel.IsValid)
+                return View(viewModel);
+            else
+                return NotFound();
         }
 
-        private async Task<int> ObterQuantidadeDeFabricantes()
+        private async Task<int> GetQtdAmigos()
         {
-            var response = await _httpClient.GetAsync("api/Pais");
+            var response = await _httpClientAmigo.GetAsync("");
 
-            var contentString = await response.Content.ReadAsStringAsync();
+            if(response.IsSuccessStatusCode)
+                return response.Content.ReadAsAsync<IEnumerable<AmigoView>>().Result.Count();
+            return -1;
+        }
 
-            var fabricantes = JsonConvert.DeserializeObject<List<PaisView>>(contentString);
+        private async Task<int> GetQtdPaises()
+        {
+            var response = await _httpClientPaisEstado.GetAsync("pais");
 
-            return fabricantes.Count;
+            if(response.IsSuccessStatusCode)
+                return response.Content.ReadAsAsync<IEnumerable<PaisView>>().Result.Count();
+            return -1;
+        }
+
+        private async Task<int> GetQtdEstados()
+        {
+            var response = await _httpClientPaisEstado.GetAsync("estado");
+
+            if(response.IsSuccessStatusCode)
+                return response.Content.ReadAsAsync<IEnumerable<PaisView>>().Result.Count();
+            return -1;
         }
 
         public IActionResult Sobre() => View();

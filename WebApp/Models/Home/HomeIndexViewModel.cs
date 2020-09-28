@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace WebApp.Models.Home
+﻿namespace WebApp.Models.Home
 {
     public class HomeIndexViewModel
     {
-        public int QuantidadeProprietarios { get; set; }
-        public int QuantidadeFabricantes { get; set; }
-        public int QuantidadeCarros { get; set; }
+        public int QtdAmigos { get; set; }
+        public int QtdPaises { get; set; }
+        public int QtdEstados { get; set; }
+
+        public bool IsValid => QtdAmigos >= 0 && QtdPaises >= 0 && QtdEstados >= 0;
+
     }
 }
