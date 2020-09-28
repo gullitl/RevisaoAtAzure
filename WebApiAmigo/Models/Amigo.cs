@@ -5,7 +5,7 @@ namespace WebApiAmigo.Models
 {
     public class Amigo
     {
-        public string AmigoId { get; set; }
+        public string Id { get; set; }
         public string Nome { get; set; }
         public string Sobrenome { get; set; }
         public string Email { get; set; }
@@ -20,7 +20,7 @@ namespace WebApiAmigo.Models
 
     public class AmigoResponse
     {
-        public string AmigoId { get; set; }
+        public string Id { get; set; }
         public string Nome { get; set; }
         public string Sobrenome { get; set; }
         public string Email { get; set; }

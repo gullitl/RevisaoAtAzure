@@ -76,7 +76,7 @@ namespace WebPaisEstado.Controllers
                     throw;
             }
 
-            return CreatedAtAction("GetEstado", new { id = estado.EstadoId }, estado);
+            return CreatedAtAction("Get", new { id = estado.EstadoId }, estado);
         }
 
         // DELETE: api/estado/5

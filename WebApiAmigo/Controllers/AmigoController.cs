@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,7 +24,7 @@ namespace WebApiAmigo.Controllers
         }
 
         // GET: api/amigo/init
-        [HttpGet]
+        [HttpGet("init")]
         public string Init() => "Iniciou WebApiAmigo";
 
         [HttpGet]
@@ -54,14 +55,26 @@ namespace WebApiAmigo.Controllers
             return Ok(response);
         }
 
-        // POST api/amigo
+        // POST: api/amigo
+        // To protect from overposting attacks, enable the specific properties you want to bind to, for
+        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public void Post([FromBody] AmigoRequest request)
+        public async Task<ActionResult<Amigo>> Post(Amigo amigo)
         {
-            var amigo = Mapper.Map<Amigo>(request);
-
+            amigo.Id = Guid.NewGuid().ToString();
             _context.Amigos.Add(amigo);
-            _context.SaveChanges();
+            try
+            {
+                await _context.SaveChangesAsync();
+            } catch(DbUpdateException)
+            {
+                if(AmigoExists(amigo.Id))
+                    return Conflict();
+                else
+                    throw;
+            }
+
+            return CreatedAtAction("Get", new { id = amigo.Id }, amigo);
         }
 
         // PUT api/amigo
@@ -75,7 +88,7 @@ namespace WebApiAmigo.Controllers
                 await _context.SaveChangesAsync();
             } catch(DbUpdateConcurrencyException)
             {
-                if(!AmigoExists(amigo.EstadoId))
+                if(!AmigoExists(amigo.Id))
                     return NotFound();
                 else
                     throw;
@@ -102,7 +115,7 @@ namespace WebApiAmigo.Controllers
         [HttpGet("{id}/amigos")]
         public ActionResult GetAmigos(string id)
         {
-            var amigo = _context.Amigos.Where(x => x.AmigoId == id).Include(x => x.Amigos).FirstOrDefault();
+            var amigo = _context.Amigos.Where(x => x.Id == id).Include(x => x.Amigos).FirstOrDefault();
 
             var amigoResponse = Mapper
                 .Map<List<AmigoResponse>>(amigo.Amigos.ToList());
@@ -111,23 +124,23 @@ namespace WebApiAmigo.Controllers
         }
 
         [HttpPost("{id}/amigos")]
-        public ActionResult PostAmigos([FromRoute]int id, [FromBody] AmigosDoAmigoRequest request)
+        public async Task<ActionResult> PostAmigos(string id, AmigosDoAmigoRequest request)
         {
-            var amigo = _context.Amigos.Find(id);
+            Amigo amigo = _context.Amigos.Find(id);
             
-            var amigos = _context.Amigos.Where(x => request.AmigosRelacionados.Contains(x.AmigoId)).ToList();
+            var amigos = _context.Amigos.Where(x => request.AmigosRelacionados.Contains(x.Id)).ToList();
 
             amigo.Amigos = amigos;
 
             _context.Update(amigo);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return Ok();
         }
 
         // GET: api/amigo/5/exists
         [HttpGet("{id}/exists")]
-        private bool AmigoExists(string id) => _context.Amigos.Any(e => e.AmigoId == id);
+        public bool AmigoExists(string id) => _context.Amigos.Any(e => e.Id == id);
     }
 
     
