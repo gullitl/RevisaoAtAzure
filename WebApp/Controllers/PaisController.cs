@@ -21,7 +21,7 @@ namespace WebApp.Controllers
         // GET: Pais
         public async Task<IActionResult> Index()
         {
-            var response = await _httpClient.GetAsync("pais");
+            HttpResponseMessage response = await _httpClient.GetAsync("pais");
             if(response.IsSuccessStatusCode) 
                 return View(await response.Content.ReadAsAsync<List<PaisView>>());
             else
@@ -37,7 +37,7 @@ namespace WebApp.Controllers
             var response = await _httpClient.GetAsync($"pais/{id}");
             if(response.IsSuccessStatusCode) 
             {
-                var pais = await response.Content.ReadAsAsync<PaisView>();
+                PaisView pais = await response.Content.ReadAsAsync<PaisView>();
                 if(pais == null)
                     return NotFound();
                 
@@ -49,10 +49,7 @@ namespace WebApp.Controllers
         }
 
         // GET: Pais/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
+        public IActionResult Create() => View();
 
         // POST: Pais/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to, for 
@@ -63,7 +60,7 @@ namespace WebApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                var urlLogo = _serviceUpload.Upload(pais.LogoFile);
+                string urlLogo = _serviceUpload.Upload(pais.LogoFile);
                 pais.FotoBandeira = urlLogo;
                 HttpResponseMessage response = await _httpClient.PostAsJsonAsync($"pais", pais);
 
@@ -79,10 +76,10 @@ namespace WebApp.Controllers
             if (id == null)
                 return NotFound();
 
-            var response = await _httpClient.GetAsync($"pais/{id}");
+            HttpResponseMessage response = await _httpClient.GetAsync($"pais/{id}");
             if(response.IsSuccessStatusCode) 
             {
-                var pais = await response.Content.ReadAsAsync<PaisView>();
+                PaisView pais = await response.Content.ReadAsAsync<PaisView>();
                 if(pais == null)
                     return NotFound();
 
@@ -105,7 +102,7 @@ namespace WebApp.Controllers
             {
                 try
                 {
-                    var urlLogo = _serviceUpload.Upload(pais.LogoFile);
+                    string urlLogo = _serviceUpload.Upload(pais.LogoFile);
                     pais.FotoBandeira = urlLogo;
                     await _httpClient.PutAsJsonAsync($"pais", pais);
                     return RedirectToAction(nameof(Index));
@@ -127,10 +124,10 @@ namespace WebApp.Controllers
             if (id == null)
                 return NotFound();
 
-            var response = await _httpClient.GetAsync($"pais/{id}");
+            HttpResponseMessage response = await _httpClient.GetAsync($"pais/{id}");
             if(response.IsSuccessStatusCode) 
             {
-                var pais = await response.Content.ReadAsAsync<PaisView>();
+                PaisView pais = await response.Content.ReadAsAsync<PaisView>();
                 if(pais == null)
                     return NotFound();
 
@@ -150,7 +147,7 @@ namespace WebApp.Controllers
 
         private async Task<bool> PaisExists(string id)
         {
-            var response = await _httpClient.GetAsync($"pais/{id}/exists");
+            HttpResponseMessage response = await _httpClient.GetAsync($"pais/{id}/exists");
             if(response.IsSuccessStatusCode) 
             {
                 return await response.Content.ReadAsAsync<bool>();

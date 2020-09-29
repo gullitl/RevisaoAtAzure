@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
-using WebApp.Models.Estado;
 
 namespace WebApp.Models.Pais
 {
@@ -22,7 +21,7 @@ namespace WebApp.Models.Pais
         [DisplayName("Bandeira")]
         public string FotoBandeira { get; set; }
 
-        public List<EstadoView> Estados { get; set; }
+        public List<Estado.EstadoView> Estados { get; set; }
 
         
     }

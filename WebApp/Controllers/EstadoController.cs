@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
 using System.Data.Entity.Infrastructure;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using WebApp.Models.Estado;
@@ -23,10 +24,34 @@ namespace WebApp.Controllers
         // GET: Estado
         public async Task<IActionResult> Index()
         {
-            var response = await _httpClient.GetAsync("estado");
-            if(response.IsSuccessStatusCode)
-                return View(await response.Content.ReadAsAsync<List<EstadoView>>());
-            else
+            HttpResponseMessage responseEstado = await _httpClient.GetAsync("estado");
+            if(responseEstado.IsSuccessStatusCode)
+            {
+                IEnumerable<EstadoView> estados = await responseEstado.Content.ReadAsAsync<IEnumerable<EstadoView>>();
+
+                var responsePais = await _httpClient.GetAsync("pais");
+                if(responsePais.IsSuccessStatusCode)
+                {
+                    IEnumerable<PaisView> paises = await responsePais.Content.ReadAsAsync<IEnumerable<PaisView>>();
+
+                    IEnumerable<EstadoView> estadosComPaises = from e in estados
+                                           join p in paises on e.PaisId equals p.Id
+                                           select new EstadoView
+                                           {
+                                               Id = e.Id,
+                                               Nome = e.Nome,
+                                               Pais = p,
+                                               PaisId = p.Id,
+                                               FotoBandeira = e.FotoBandeira
+                                           };
+
+                    return View(estadosComPaises);
+
+                } else
+                    return NotFound();
+
+                
+            } else
                 return NotFound();
         }
 
@@ -36,14 +61,21 @@ namespace WebApp.Controllers
             if(id == null)
                 return NotFound();
 
-            var response = await _httpClient.GetAsync($"estado/{id}");
-            if(response.IsSuccessStatusCode) 
+            var responseEstado = await _httpClient.GetAsync($"estado/{id}");
+            if(responseEstado.IsSuccessStatusCode) 
             {
-                var pais = await response.Content.ReadAsAsync<EstadoView>();
-                if(pais == null)
+                EstadoView estado = await responseEstado.Content.ReadAsAsync<EstadoView>();
+                if(estado == null)
                     return NotFound();
 
-                return View(pais);
+                var responsePais = await _httpClient.GetAsync($"pais/{estado.PaisId}");
+                if(responsePais.IsSuccessStatusCode)
+                {
+                    estado.Pais = await responsePais.Content.ReadAsAsync<PaisView>();
+                    return View(estado);
+                } else
+                    return NotFound();
+                    
             } else
                 return NotFound();
         }
@@ -51,9 +83,14 @@ namespace WebApp.Controllers
         // GET: Estado/Create
         public async Task<IActionResult> Create()
         {
-            var response = await _httpClient.GetAsync("pais");
-            ViewData["PaisId"] = new SelectList(await response.Content.ReadAsAsync<List<PaisView>>(), "PaisId", "Nome");
-            return View();
+            HttpResponseMessage response = await _httpClient.GetAsync("pais");
+            if(response.IsSuccessStatusCode)
+            {
+                ViewData["PaisId"] = new SelectList(await response.Content.ReadAsAsync<List<PaisView>>(), "Id", "Nome");
+                return View();
+            }
+
+            return NotFound();
         }
 
         // POST: Estado/Create
@@ -61,11 +98,11 @@ namespace WebApp.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("EstadoId,Nome,PaisId,LogoFile")] EstadoView estado)
+        public async Task<IActionResult> Create([Bind("Id,Nome,PaisId,LogoFile")] EstadoView estado)
         {
             if (ModelState.IsValid)
             {
-                var urlLogo = _serviceUpload.Upload(estado.LogoFile);
+                string urlLogo = _serviceUpload.Upload(estado.LogoFile);
                 estado.FotoBandeira = urlLogo;
                 HttpResponseMessage result = await _httpClient.PostAsJsonAsync("estado", estado);
 
@@ -74,7 +111,7 @@ namespace WebApp.Controllers
 
             }
             var response = await _httpClient.GetAsync("pais");
-            ViewData["PaisId"] = new SelectList(await response.Content.ReadAsAsync<List<PaisView>>(), "PaisId", "Nome", estado.PaisId);
+            ViewData["PaisId"] = new SelectList(await response.Content.ReadAsAsync<List<PaisView>>(), "Id", "Nome", estado.PaisId);
             return View(estado);
         }
 
@@ -82,18 +119,16 @@ namespace WebApp.Controllers
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
-            var response = await _httpClient.GetAsync($"estado/{id}");
-            if(response.IsSuccessStatusCode) {
-                var estado = await response.Content.ReadAsAsync<EstadoView>();
+            var responseEstado = await _httpClient.GetAsync($"estado/{id}");
+            if(responseEstado.IsSuccessStatusCode) {
+                EstadoView estado = await responseEstado.Content.ReadAsAsync<EstadoView>();
                 if(estado == null)
                     return NotFound();
 
-                var response1 = await _httpClient.GetAsync("pais");
-                ViewData["PaisId"] = new SelectList(await response1.Content.ReadAsAsync<List<PaisView>>(), "PaisId", "Nome", estado.PaisId);
+                var responsePais = await _httpClient.GetAsync("pais");
+                ViewData["PaisId"] = new SelectList(await responsePais.Content.ReadAsAsync<List<PaisView>>(), "Id", "Nome", estado.PaisId);
                 return View(estado);
             } else
                 return NotFound();
@@ -105,30 +140,30 @@ namespace WebApp.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("EstadoId,Nome,PaisId,LogoFile")] EstadoView estado)
+        public async Task<IActionResult> Edit(string id, [Bind("Id,Nome,PaisId,LogoFile")] EstadoView estado)
         {
-            if (id != estado.EstadoId)
+            if (id != estado.Id)
                 return NotFound();
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    var urlLogo = _serviceUpload.Upload(estado.LogoFile);
+                    string urlLogo = _serviceUpload.Upload(estado.LogoFile);
                     estado.FotoBandeira = urlLogo;
                     await _httpClient.PutAsJsonAsync("estado", estado);
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!await EstadoExists(estado.EstadoId))
+                    if (!await EstadoExists(estado.Id))
                         return NotFound();
                     else
                         throw;
                 }
-                return RedirectToAction(nameof(Index));
             }
-            var response = await _httpClient.GetAsync("pais");
-            ViewData["PaisId"] = new SelectList(await response.Content.ReadAsAsync<List<PaisView>>(), "PaisId", "Nome", estado.PaisId);
+            HttpResponseMessage response = await _httpClient.GetAsync("pais");
+            ViewData["PaisId"] = new SelectList(await response.Content.ReadAsAsync<List<PaisView>>(), "Id", "Nome", estado.PaisId);
             return View(estado);
         }
 
@@ -136,17 +171,22 @@ namespace WebApp.Controllers
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
-            var response = await _httpClient.GetAsync($"estado/{id}");
-            if(response.IsSuccessStatusCode) {
-                var estado = await response.Content.ReadAsAsync<EstadoView>();
+            HttpResponseMessage responseEstado = await _httpClient.GetAsync($"estado/{id}");
+            if(responseEstado.IsSuccessStatusCode) {
+                EstadoView estado = await responseEstado.Content.ReadAsAsync<EstadoView>();
                 if(estado == null)
                     return NotFound();
 
-                return View(estado);
+                HttpResponseMessage responsePais = await _httpClient.GetAsync($"pais/{estado.PaisId}");
+                if(responsePais.IsSuccessStatusCode)
+                {
+                    estado.Pais = await responsePais.Content.ReadAsAsync<PaisView>();
+                    return View(estado);
+                }
+                return NotFound();
+                    
             } else
                 return NotFound();
         }
@@ -156,8 +196,10 @@ namespace WebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            await _httpClient.DeleteAsync($"estado/{id}");
-            return RedirectToAction(nameof(Index));
+            HttpResponseMessage response = await _httpClient.DeleteAsync($"estado/{id}");
+            if(response.IsSuccessStatusCode)
+                return RedirectToAction(nameof(Index));
+            return NotFound();
         }
 
         private async Task<bool> EstadoExists(string id)

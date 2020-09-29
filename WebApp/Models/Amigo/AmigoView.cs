@@ -33,7 +33,7 @@ namespace WebApp.Models.Amigo
         public DateTime DataNascimento { get; set; }
 
         [JsonIgnore]
-        public PaisView Pais { get; set; }
+        public Pais.PaisView Pais { get; set; }
 
         [Required(ErrorMessage = "Campo Pais obrigatório.")]
         [ForeignKey("Pais")]
@@ -41,7 +41,7 @@ namespace WebApp.Models.Amigo
         public string PaisId { get; set; }
 
         [JsonIgnore]
-        public EstadoView Estado { get; set; }
+        public Estado.EstadoView Estado { get; set; }
 
         [Required(ErrorMessage = "Campo Estado obrigatório.")]
         [ForeignKey("Estado")]
