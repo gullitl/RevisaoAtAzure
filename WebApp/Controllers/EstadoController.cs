@@ -21,6 +21,7 @@ namespace WebApp.Controllers
             _httpClient = httpClient.GetClient();
             _serviceUpload = serviceUpload;
         }
+        
         // GET: Estado
         public async Task<IActionResult> Index()
         {
@@ -29,19 +30,20 @@ namespace WebApp.Controllers
             {
                 IEnumerable<EstadoView> estados = await responseEstado.Content.ReadAsAsync<IEnumerable<EstadoView>>();
 
-                var responsePais = await _httpClient.GetAsync("pais");
+                HttpResponseMessage responsePais = await _httpClient.GetAsync("pais");
                 if(responsePais.IsSuccessStatusCode)
                 {
                     IEnumerable<PaisView> paises = await responsePais.Content.ReadAsAsync<IEnumerable<PaisView>>();
 
                     IEnumerable<EstadoView> estadosComPaises = from e in estados
-                                           join p in paises on e.PaisId equals p.Id
+                                           join p in paises on e.PaisId equals p.Id into paisestado
+                                           from pe in paisestado.DefaultIfEmpty()
                                            select new EstadoView
                                            {
                                                Id = e.Id,
                                                Nome = e.Nome,
-                                               Pais = p,
-                                               PaisId = p.Id,
+                                               Pais = pe ?? null,
+                                               PaisId = pe?.Id ?? string.Empty,
                                                FotoBandeira = e.FotoBandeira
                                            };
 
@@ -61,14 +63,14 @@ namespace WebApp.Controllers
             if(id == null)
                 return NotFound();
 
-            var responseEstado = await _httpClient.GetAsync($"estado/{id}");
+            HttpResponseMessage responseEstado = await _httpClient.GetAsync($"estado/{id}");
             if(responseEstado.IsSuccessStatusCode) 
             {
                 EstadoView estado = await responseEstado.Content.ReadAsAsync<EstadoView>();
                 if(estado == null)
                     return NotFound();
 
-                var responsePais = await _httpClient.GetAsync($"pais/{estado.PaisId}");
+                HttpResponseMessage responsePais = await _httpClient.GetAsync($"pais/{estado.PaisId}");
                 if(responsePais.IsSuccessStatusCode)
                 {
                     estado.Pais = await responsePais.Content.ReadAsAsync<PaisView>();
@@ -110,8 +112,10 @@ namespace WebApp.Controllers
                     return RedirectToAction(nameof(Index));
 
             }
-            var response = await _httpClient.GetAsync("pais");
-            ViewData["PaisId"] = new SelectList(await response.Content.ReadAsAsync<List<PaisView>>(), "Id", "Nome", estado.PaisId);
+            HttpResponseMessage response = await _httpClient.GetAsync("pais");
+            if(response.IsSuccessStatusCode)
+                ViewData["PaisId"] = new SelectList(await response.Content.ReadAsAsync<List<PaisView>>(), "Id", "Nome", estado.PaisId);
+            
             return View(estado);
         }
 
@@ -121,13 +125,13 @@ namespace WebApp.Controllers
             if (id == null)
                 return NotFound();
 
-            var responseEstado = await _httpClient.GetAsync($"estado/{id}");
+            HttpResponseMessage responseEstado = await _httpClient.GetAsync($"estado/{id}");
             if(responseEstado.IsSuccessStatusCode) {
                 EstadoView estado = await responseEstado.Content.ReadAsAsync<EstadoView>();
                 if(estado == null)
                     return NotFound();
 
-                var responsePais = await _httpClient.GetAsync("pais");
+                HttpResponseMessage responsePais = await _httpClient.GetAsync("pais");
                 ViewData["PaisId"] = new SelectList(await responsePais.Content.ReadAsAsync<List<PaisView>>(), "Id", "Nome", estado.PaisId);
                 return View(estado);
             } else

@@ -16,26 +16,74 @@ namespace WebApp.Controllers
 {
     public class AmigoController : Controller
     {
-        public readonly HttpClient _httpClient;
+        public readonly HttpClient _httpClientAmigo;
+        public readonly HttpClient _httpClientPaisEstado;
         public readonly IServiceUpload _serviceUpload;
 
-        public AmigoController(IServiceHttpClientAmigo httpClient, IServiceUpload serviceUpload)
+        public AmigoController(IServiceHttpClientAmigo httpClientAmigo,
+            IServiceHttpClientPaisEstado httpClientPaisEstado,
+            IServiceUpload serviceUpload)
         {
-            _httpClient = httpClient.GetClient();
+            _httpClientAmigo = httpClientAmigo.GetClient();
+            _httpClientPaisEstado = httpClientPaisEstado.GetClient();
             _serviceUpload = serviceUpload;
         }
 
+        // GET: Amigo
         [HttpGet]
-        public async Task<ActionResult> Index()
+        public async Task<IActionResult> Index()
         {
-            List<AmigoViewModel> amigos = await ObterTodosOsAmigos();
+            HttpResponseMessage responseAmigo = await _httpClientAmigo.GetAsync("");
+            if(responseAmigo.IsSuccessStatusCode)
+            {
+                IEnumerable<AmigoView> amigos = await responseAmigo.Content.ReadAsAsync<IEnumerable<AmigoView>>();
 
-            return View(amigos);
+                HttpResponseMessage responsePais = await _httpClientPaisEstado.GetAsync("pais");
+                if(responsePais.IsSuccessStatusCode)
+                {
+                    IEnumerable<PaisView> paises = await responsePais.Content.ReadAsAsync<IEnumerable<PaisView>>();
+
+                    HttpResponseMessage responseEstado = await _httpClientPaisEstado.GetAsync("estado");
+                    if(responseEstado.IsSuccessStatusCode)
+                    {
+                        IEnumerable<EstadoView> estados = await responseEstado.Content.ReadAsAsync<IEnumerable<EstadoView>>();
+
+                        IEnumerable<AmigoView> amigosComPaisesEEstados = from a in amigos
+                                                                        join p in paises on a.PaisId equals p.Id into paisamigo
+                                                                        join e in estados on a.EstadoId equals e.Id into estadoamigo
+                                                                        from pa in paisamigo.DefaultIfEmpty()
+                                                                        from ea in estadoamigo.DefaultIfEmpty()
+                                                                        select new AmigoView
+                                                                        {
+                                                                            Id = a.Id,
+                                                                            Nome = a.Nome,
+                                                                            Sobrenome = a.Sobrenome,
+                                                                            Email = a.Email,
+                                                                            Telefone = a.Telefone,
+                                                                            DataNascimento = a.DataNascimento,
+                                                                            Pais = pa ?? null,
+                                                                            PaisId = pa?.Id ?? string.Empty,
+                                                                            Estado = ea ?? null,
+                                                                            EstadoId = ea?.Id ?? string.Empty,
+                                                                            Foto = a.Foto
+                                                                        };
+
+                        return View(amigosComPaisesEEstados);
+
+                    }
+                    return NotFound();
+
+                } else
+                    return NotFound();
+
+
+            } else
+                return NotFound();
         }
 
         private async Task<List<AmigoViewModel>> ObterTodosOsAmigos()
         {
-            var response = await _httpClient.GetAsync("");
+            var response = await _httpClientAmigo.GetAsync("");
 
             var content = await response.Content.ReadAsStringAsync();
 
@@ -49,14 +97,23 @@ namespace WebApp.Controllers
             if(id == null)
                 return NotFound();
 
-            var response = await _httpClient.GetAsync($"{id}");
-            if(response.IsSuccessStatusCode)
+            HttpResponseMessage responseAmigo = await _httpClientAmigo.GetAsync($"{id}");
+            if(responseAmigo.IsSuccessStatusCode)
             {
-                var amigo = await response.Content.ReadAsAsync<AmigoView>();
+                AmigoView amigo = await responseAmigo.Content.ReadAsAsync<AmigoView>();
                 if(amigo == null)
                     return NotFound();
 
+                HttpResponseMessage responsePais = await _httpClientPaisEstado.GetAsync($"pais/{amigo.PaisId}");
+                if(responsePais.IsSuccessStatusCode)
+                    amigo.Pais = await responsePais.Content.ReadAsAsync<PaisView>();
+
+                HttpResponseMessage responseEstado = await _httpClientPaisEstado.GetAsync($"estado/{amigo.EstadoId}");
+                if(responseEstado.IsSuccessStatusCode)
+                    amigo.Estado = await responseEstado.Content.ReadAsAsync<EstadoView>();
+
                 return View(amigo);
+
             } else
                 return NotFound();
         }
@@ -64,9 +121,18 @@ namespace WebApp.Controllers
         // GET: Amigo/Create
         public async Task<IActionResult> Create()
         {
-            var response = await _httpClient.GetAsync("");
-            ViewData["PaisId"] = new SelectList(await response.Content.ReadAsAsync<List<PaisView>>(), "PaisId", "Nome");
-            ViewData["EstadoId"] = new SelectList(await response.Content.ReadAsAsync<List<EstadoView>>(), "EstadoId", "Nome");
+            HttpResponseMessage responsePais = await _httpClientPaisEstado.GetAsync("pais");
+            if(responsePais.IsSuccessStatusCode)
+                ViewData["PaisId"] = new SelectList(await responsePais.Content.ReadAsAsync<List<PaisView>>(), "Id", "Nome");
+            else
+                return NotFound();
+
+            HttpResponseMessage responseEstado = await _httpClientPaisEstado.GetAsync("estado");
+            if(responseEstado.IsSuccessStatusCode)
+                ViewData["EstadoId"] = new SelectList(await responseEstado.Content.ReadAsAsync<List<EstadoView>>(), "Id", "Nome");
+            else
+                return NotFound();
+
             return View();
         }
 
@@ -75,43 +141,50 @@ namespace WebApp.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("AmigoId,Nome,Sobrenome,Email,Telefone,PaisId,EstadoId,FotoFile")] AmigoView amigo)
+        public async Task<IActionResult> Create([Bind("Id,Nome,Sobrenome,Email,Telefone,PaisId,EstadoId,FotoFile")] AmigoView amigo)
         {
             if(ModelState.IsValid)
             {
-                var urlLogo = _serviceUpload.Upload(amigo.FotoFile);
+                string urlLogo = _serviceUpload.Upload(amigo.FotoFile);
                 amigo.Foto = urlLogo;
-                HttpResponseMessage result = await _httpClient.PostAsJsonAsync("", amigo);
+                HttpResponseMessage result = await _httpClientAmigo.PostAsJsonAsync("", amigo);
 
                 if(result.IsSuccessStatusCode)
                     return RedirectToAction(nameof(Index));
 
             }
-            var response = await _httpClient.GetAsync("");
-            ViewData["PaisId"] = new SelectList(await response.Content.ReadAsAsync<List<PaisView>>(), "PaisId", "Nome", amigo.PaisId);
-            ViewData["EstadoId"] = new SelectList(await response.Content.ReadAsAsync<List<EstadoView>>(), "EstadoId", "Nome");
+            HttpResponseMessage responsePais = await _httpClientPaisEstado.GetAsync("pais");
+            if(responsePais.IsSuccessStatusCode)
+                ViewData["PaisId"] = new SelectList(await responsePais.Content.ReadAsAsync<List<PaisView>>(), "Id", "Nome", amigo.PaisId);
+
+            HttpResponseMessage responseEstado = await _httpClientPaisEstado.GetAsync("estado");
+            if(responseEstado.IsSuccessStatusCode)
+                ViewData["EstadoId"] = new SelectList(await responseEstado.Content.ReadAsAsync<List<EstadoView>>(), "Id", "Nome");
+            
             return View(amigo);
         }
-
 
         // GET: Amigo/Edit/5
         public async Task<IActionResult> Edit(string id)
         {
             if(id == null)
-            {
                 return NotFound();
-            }
 
-            var response = await _httpClient.GetAsync($"{id}");
+            HttpResponseMessage response = await _httpClientAmigo.GetAsync($"{id}");
             if(response.IsSuccessStatusCode)
             {
-                var amigo = await response.Content.ReadAsAsync<AmigoView>();
+                AmigoView amigo = await response.Content.ReadAsAsync<AmigoView>();
                 if(amigo == null)
                     return NotFound();
 
-                var response1 = await _httpClient.GetAsync("");
-                ViewData["PaisId"] = new SelectList(await response1.Content.ReadAsAsync<List<PaisView>>(), "PaisId", "Nome", amigo.PaisId);
-                ViewData["EstadoId"] = new SelectList(await response1.Content.ReadAsAsync<List<EstadoView>>(), "EstadoId", "Nome", amigo.EstadoId);
+                HttpResponseMessage responsePais = await _httpClientPaisEstado.GetAsync("pais");
+                if(responsePais.IsSuccessStatusCode)
+                    ViewData["PaisId"] = new SelectList(await responsePais.Content.ReadAsAsync<List<PaisView>>(), "Id", "Nome", amigo.PaisId);
+
+                HttpResponseMessage responseEstado = await _httpClientPaisEstado.GetAsync("estado");
+                if(responseEstado.IsSuccessStatusCode)
+                    ViewData["EstadoId"] = new SelectList(await responseEstado.Content.ReadAsAsync<List<EstadoView>>(), "Id", "Nome");
+
                 return View(amigo);
             } else
                 return NotFound();
@@ -123,18 +196,19 @@ namespace WebApp.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("AmigoId,Nome,Sobrenome,Email,Telefone,PaisId,EstadoId,FotoFile")] AmigoView amigo)
+        public async Task<IActionResult> Edit(string id, [Bind("Id,Nome,Sobrenome,Email,Telefone,PaisId,EstadoId,FotoFile")] AmigoView amigo)
         {
-            if(id != amigo.AmigoId)
+            if(id != amigo.Id)
                 return NotFound();
 
             if(ModelState.IsValid)
             {
                 try
                 {
-                    var urlLogo = _serviceUpload.Upload(amigo.FotoFile);
+                    string urlLogo = _serviceUpload.Upload(amigo.FotoFile);
                     amigo.Foto = urlLogo;
-                    await _httpClient.PutAsJsonAsync("", amigo);
+                    await _httpClientAmigo.PutAsJsonAsync("", amigo);
+                    return RedirectToAction(nameof(Index));
                 } catch(DbUpdateConcurrencyException)
                 {
                     if(!await AmigoExists(amigo.EstadoId))
@@ -142,11 +216,15 @@ namespace WebApp.Controllers
                     else
                         throw;
                 }
-                return RedirectToAction(nameof(Index));
             }
-            var response = await _httpClient.GetAsync("");
-            ViewData["PaisId"] = new SelectList(await response.Content.ReadAsAsync<List<PaisView>>(), "PaisId", "Nome", amigo.PaisId);
-            ViewData["EstadoId"] = new SelectList(await response.Content.ReadAsAsync<List<EstadoView>>(), "EstadoId", "Nome", amigo.EstadoId);
+            HttpResponseMessage responsePais = await _httpClientPaisEstado.GetAsync("pais");
+            if(responsePais.IsSuccessStatusCode)
+                ViewData["PaisId"] = new SelectList(await responsePais.Content.ReadAsAsync<List<PaisView>>(), "Id", "Nome", amigo.PaisId);
+
+            HttpResponseMessage responseEstado = await _httpClientPaisEstado.GetAsync("estado");
+            if(responseEstado.IsSuccessStatusCode)
+                ViewData["EstadoId"] = new SelectList(await responseEstado.Content.ReadAsAsync<List<EstadoView>>(), "Id", "Nome");
+
             return View(amigo);
         }
 
@@ -154,18 +232,24 @@ namespace WebApp.Controllers
         public async Task<IActionResult> Delete(string id)
         {
             if(id == null)
-            {
                 return NotFound();
-            }
 
-            var response = await _httpClient.GetAsync($"{id}");
-            if(response.IsSuccessStatusCode)
+            HttpResponseMessage responseAmigo = await _httpClientAmigo.GetAsync($"{id}");
+            if(responseAmigo.IsSuccessStatusCode)
             {
-                var estado = await response.Content.ReadAsAsync<EstadoView>();
-                if(estado == null)
+                AmigoView amigo = await responseAmigo.Content.ReadAsAsync<AmigoView>();
+                if(amigo == null)
                     return NotFound();
 
-                return View(estado);
+                HttpResponseMessage responsePais = await _httpClientPaisEstado.GetAsync($"pais/{amigo.PaisId}");
+                if(responsePais.IsSuccessStatusCode)
+                    amigo.Pais = await responsePais.Content.ReadAsAsync<PaisView>();
+
+                HttpResponseMessage responseEstado = await _httpClientPaisEstado.GetAsync($"estado/{amigo.EstadoId}");
+                if(responseEstado.IsSuccessStatusCode)
+                    amigo.Estado = await responseEstado.Content.ReadAsAsync<EstadoView>();
+
+                return View(amigo);
             } else
                 return NotFound();
         }
@@ -175,8 +259,11 @@ namespace WebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            await _httpClient.DeleteAsync($"{id}");
-            return RedirectToAction(nameof(Index));
+            HttpResponseMessage response = await _httpClientAmigo.DeleteAsync($"{id}");
+            if(response.IsSuccessStatusCode)
+                return RedirectToAction(nameof(Index));
+
+            return NotFound();
         }
 
         [HttpGet("{id}")]
@@ -184,9 +271,9 @@ namespace WebApp.Controllers
         {
             var viewModel = new RelacionarAmigosViewModel();
 
-            var response = await _httpClient.GetAsync($"{id}/amigos");
+            HttpResponseMessage response = await _httpClientAmigo.GetAsync($"{id}/amigos");
 
-            var content = await response.Content.ReadAsStringAsync();
+            string content = await response.Content.ReadAsStringAsync();
 
             viewModel.TodosAmigos = await ObterTodosOsAmigos();
 
@@ -208,14 +295,14 @@ namespace WebApp.Controllers
 
             var stringContent = new StringContent(amigosJson, Encoding.UTF8, "application/json");
 
-            await _httpClient.PostAsync($"{form.Amigo.Id}/amigos", stringContent);
+            await _httpClientAmigo.PostAsync($"{form.Amigo.Id}/amigos", stringContent);
 
             return RedirectToAction(nameof(RelacionarAmigos), new { form.Amigo.Id });
         }
 
         private async Task<bool> AmigoExists(string id)
         {
-            var response = await _httpClient.GetAsync($"{id}/exists");
+            var response = await _httpClientAmigo.GetAsync($"{id}/exists");
             if(response.IsSuccessStatusCode)
                 return await response.Content.ReadAsAsync<bool>();
             else

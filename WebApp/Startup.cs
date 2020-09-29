@@ -31,7 +31,7 @@ namespace WebApp
             });
 
             services.AddHttpClient<IServiceHttpClientAmigo, ServiceHttpClientAmigo>(x => {
-                x.BaseAddress = new Uri("https://localhost:44395/api/amigo");
+                x.BaseAddress = new Uri("https://localhost:44395/api/amigo/");
                 x.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             });
 

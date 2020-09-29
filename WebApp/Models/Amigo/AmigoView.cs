@@ -4,15 +4,13 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
-using WebApp.Models.Estado;
-using WebApp.Models.Pais;
 
 namespace WebApp.Models.Amigo
 {
     public class AmigoView
     {
         [Key]
-        public string AmigoId { get; set; }
+        public string Id { get; set; }
 
         [Required(ErrorMessage = "Campo Nome obrigatório.")]
         [DisplayName("Nome")]
