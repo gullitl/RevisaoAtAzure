@@ -4,6 +4,8 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
+using WebApp.Models.Estado;
+using WebApp.Models.Pais;
 
 namespace WebApp.Models.Amigo
 {
@@ -31,7 +33,7 @@ namespace WebApp.Models.Amigo
         public DateTime DataNascimento { get; set; }
 
         [JsonIgnore]
-        public Pais.PaisView Pais { get; set; }
+        public PaisView Pais { get; set; }
 
         [Required(ErrorMessage = "Campo Pais obrigatório.")]
         [ForeignKey("Pais")]
@@ -39,7 +41,7 @@ namespace WebApp.Models.Amigo
         public string PaisId { get; set; }
 
         [JsonIgnore]
-        public Estado.EstadoView Estado { get; set; }
+        public EstadoView Estado { get; set; }
 
         [Required(ErrorMessage = "Campo Estado obrigatório.")]
         [ForeignKey("Estado")]

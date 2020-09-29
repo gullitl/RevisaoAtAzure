@@ -104,13 +104,19 @@ namespace WebApp.Controllers
                 if(amigo == null)
                     return NotFound();
 
-                HttpResponseMessage responsePais = await _httpClientPaisEstado.GetAsync($"pais/{amigo.PaisId}");
-                if(responsePais.IsSuccessStatusCode)
-                    amigo.Pais = await responsePais.Content.ReadAsAsync<PaisView>();
+                if(amigo.PaisId != null)
+                {
+                    HttpResponseMessage responsePais = await _httpClientPaisEstado.GetAsync($"pais/{amigo.PaisId}");
+                    if(responsePais.IsSuccessStatusCode)
+                        amigo.Pais = await responsePais.Content.ReadAsAsync<PaisView>();
+                }
 
-                HttpResponseMessage responseEstado = await _httpClientPaisEstado.GetAsync($"estado/{amigo.EstadoId}");
-                if(responseEstado.IsSuccessStatusCode)
-                    amigo.Estado = await responseEstado.Content.ReadAsAsync<EstadoView>();
+                if(amigo.EstadoId != null)
+                {
+                    HttpResponseMessage responseEstado = await _httpClientPaisEstado.GetAsync($"estado/{amigo.EstadoId}");
+                    if(responseEstado.IsSuccessStatusCode)
+                        amigo.Estado = await responseEstado.Content.ReadAsAsync<EstadoView>();
+                }
 
                 return View(amigo);
 

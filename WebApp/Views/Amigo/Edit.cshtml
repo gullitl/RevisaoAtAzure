@@ -5,13 +5,13 @@
 }
 
 <h1>Edição do Amigo</h1>
-<br />
 <hr />
+<br />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Edit" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="EstadoId" />
+            <input type="hidden" asp-for="Id" />
             <div class="form-group">
                 <label asp-for="FotoFile" class="control-label"></label>
                 <input type="file" asp-for="FotoFile" class="form-control" />
