@@ -59,7 +59,7 @@ namespace WebApp.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("PaisId,Nome,LogoFile")] PaisView pais)
+        public async Task<IActionResult> Create([Bind("Id,Nome,LogoFile")] PaisView pais)
         {
             if (ModelState.IsValid)
             {
@@ -96,9 +96,9 @@ namespace WebApp.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("PaisId,Nome,LogoFile")] PaisView pais)
+        public async Task<IActionResult> Edit(string id, [Bind("Id,Nome,LogoFile")] PaisView pais)
         {
-            if (id != pais.PaisId)
+            if (id != pais.Id)
                 return NotFound();
 
             if (ModelState.IsValid)
@@ -108,15 +108,15 @@ namespace WebApp.Controllers
                     var urlLogo = _serviceUpload.Upload(pais.LogoFile);
                     pais.FotoBandeira = urlLogo;
                     await _httpClient.PutAsJsonAsync($"pais", pais);
+                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!await PaisExists(pais.PaisId))
+                    if (!await PaisExists(pais.Id))
                         return NotFound();
                     else
                         throw;
                 }
-                return RedirectToAction(nameof(Index));
             }
             return View(pais);
         }
@@ -144,7 +144,7 @@ namespace WebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            await _httpClient.DeleteAsync($"pais{id}");
+            await _httpClient.DeleteAsync($"pais/{id}");
             return RedirectToAction(nameof(Index));
         }
 

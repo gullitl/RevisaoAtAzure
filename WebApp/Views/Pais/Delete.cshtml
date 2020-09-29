@@ -10,7 +10,7 @@
 <h3>Você tem certeza que deseja excluir este Pais?</h3>
 <div>
     <hr />
-    <dl class="row
+    <dl class="row">
                 <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.FotoBandeira)
         </dt>
@@ -26,8 +26,8 @@
     </dl>
 
     <form asp-action="Delete">
-        <input type="hidden" asp-for="PaisId" />
+        <input type="hidden" asp-for="Id" />
         <input type="submit" value="Excluir" class="btn btn-danger" /> |
-        <a asp-action="Index">Voltar à Lista</a>
+        <a asp-action="Index">Listar</a>
     </form>
 </div>

@@ -10,7 +10,7 @@ namespace WebApp.Models.Pais
     public class PaisView
     {
         [Key]
-        public string PaisId { get; set; }
+        public string Id { get; set; }
 
         [Required(ErrorMessage = "Campo Nome Completo obrigatório.")]
         [DisplayName("Nome")]

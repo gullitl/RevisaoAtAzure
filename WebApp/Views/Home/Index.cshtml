@@ -6,17 +6,28 @@
 
 <div class="text-left">
     <h1>Quantidades</h1>
-    
     <hr />
-    <div>Amigos 
-        <h4>@Model.QtdAmigos</h4>
-    </div>
     <br />
-    <div>Paises 
-        <h4>@Model.QtdPaises</h4>
-    </div>
-    <br />
-    <div>Estados 
-        <h4>@Model.QtdEstados</h4>
+    <div>
+        <dl class="row">
+            <dt class="col-sm-1">
+                Amigos:
+            </dt>
+            <dd class="col-sm-3">
+                <h3>@Model.QtdAmigos</h3>
+            </dd>
+            <dt class="col-sm-1">
+                Paises:
+            </dt>
+            <dd class="col-sm-3">
+                <h3>@Model.QtdPaises</h3>
+            </dd>
+            <dt class="col-sm-1">
+                Estados:
+            </dt>
+            <dd class="col-sm-3">
+                <h3>@Model.QtdEstados</h3>
+            </dd>
+        </dl>
     </div>
 </div>
