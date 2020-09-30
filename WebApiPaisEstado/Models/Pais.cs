@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace WebPaisEstado.Models
+namespace WebApiPaisEstado.Models
 {
     public class Pais
     {

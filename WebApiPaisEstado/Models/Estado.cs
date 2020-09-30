@@ -1,4 +1,4 @@
-﻿namespace WebPaisEstado.Models
+﻿namespace WebApiPaisEstado.Models
 {
     public class Estado
     {

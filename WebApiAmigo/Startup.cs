@@ -24,8 +24,13 @@ namespace WebApiAmigo
         {
             services.AddControllers();
 
+            services.AddControllersWithViews()
+                .AddNewtonsoftJson(options =>
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+            );
+
             services.AddDbContext<WebApiAmigoContext>(options =>
-                    options.UseMySQL(Configuration.GetConnectionString("WebApiAmigoContext")));
+                    options.UseMySQL(Configuration.GetConnectionString("WebApiAmigo")));
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         }

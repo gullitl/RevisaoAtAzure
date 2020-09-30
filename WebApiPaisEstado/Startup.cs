@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using WebPaisEstado.Data;
+using WebApiPaisEstado.Data;
 
-namespace WebPaisEstado
+namespace WebApiPaisEstado
 {
     public class Startup
     {
@@ -22,8 +22,13 @@ namespace WebPaisEstado
         {
             services.AddControllers();
 
+            services.AddControllersWithViews()
+                .AddNewtonsoftJson(options =>
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+            );
+
             services.AddDbContext<WebPaisEstadoContext>(options =>
-                    options.UseMySQL(Configuration.GetConnectionString("WebPaisEstadoContext")));
+                    options.UseMySQL(Configuration.GetConnectionString("WebApiPaisEstado")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

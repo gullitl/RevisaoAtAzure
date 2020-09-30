@@ -271,7 +271,6 @@ namespace WebApp.Controllers
             if(responseAmigo.IsSuccessStatusCode)
             {
                 AmigosRelacionadosView viewModel = await responseAmigo.Content.ReadAsAsync<AmigosRelacionadosView>();
-                viewModel.AmigosRelacionadosIds = viewModel.Amigo.AmigosRelacionados.Select(x => x.Id).ToList();
                 return View(viewModel);
             }
 
@@ -279,12 +278,12 @@ namespace WebApp.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> RelacionarAmigos([FromForm]AmigosRelacionadosView form)
+        public async Task<ActionResult> RelacionarAmigos([FromForm]AmigosRelacionadosView amigosRelacionados)
         {
-            HttpResponseMessage result = await _httpClientAmigo.PostAsJsonAsync($"{form.Amigo.Id}/amigos", new { form.AmigosRelacionadosIds });
+            HttpResponseMessage result = await _httpClientAmigo.PostAsJsonAsync("amigos", amigosRelacionados);
 
             if(result.IsSuccessStatusCode)
-                return RedirectToAction(nameof(RelacionarAmigos), new { form.Amigo.Id });
+                return RedirectToAction(nameof(RelacionarAmigos), new { amigosRelacionados.Amigo.Id });
 
             return NotFound();
         }

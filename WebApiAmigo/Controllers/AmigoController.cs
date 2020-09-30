@@ -31,7 +31,33 @@ namespace WebApiAmigo.Controllers
             {
                 IEnumerable<Amigo> amigosnapshot = _context.GetAmigoSnapshot();
                 _context.Amigos.AddRange(amigosnapshot);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
+
+
+                IEnumerable<AmigosRelacionados> amigosrelacionadosnapshot = _context.GetAmigosRelacionadosSnapshot();
+
+                var amigos = amigosrelacionadosnapshot.ToList().Select(ar =>
+                {
+                    List<Amigo> amigos = _context.Amigos.Where(x => ar.AmigosRelacionadosIds.Contains(x.Id)).ToListAsync().Result;
+                    Amigo amigo = _context.Amigos.FindAsync(ar.Amigo.Id).Result;
+                    amigo.AmigosRelacionados = amigos;
+                    return amigo;
+                });
+
+
+
+
+                //List<Amigo> amigos = await _context.Amigos.Where(x => amigosRelacionados.AmigosRelacionadosIds.Contains(x.Id)).ToListAsync();
+
+                //Amigo amigo = await _context.Amigos.FindAsync(id);
+                //amigo.AmigosRelacionados = amigos;
+
+                _context.UpdateRange(amigos);
+                await _context.SaveChangesAsync();
+
+
+
+
             }
 
             return "Iniciou WebApiAmigo";
@@ -110,21 +136,22 @@ namespace WebApiAmigo.Controllers
         [HttpGet("{id}/amigos")]
         public ActionResult GetAmigos(string id)
         {
-            var amigoEAmigosRelacionados = new
+            var amigosRelacionados = new AmigosRelacionados
             {
                 Amigo = _context.Amigos.Where(x => x.Id == id).Include(x => x.AmigosRelacionados).FirstOrDefaultAsync().Result,
                 TodosAmigos = _context.Amigos.Where(x => x.Id != id).ToListAsync().Result
             };
+            amigosRelacionados.AmigosRelacionadosIds = amigosRelacionados.Amigo.AmigosRelacionados.Select(x => x.Id).ToList();
 
-            return Ok(amigoEAmigosRelacionados);
+            return Ok(amigosRelacionados);
         }
 
-        [HttpPost("{id}/amigos")]
-        public async Task<ActionResult> PostAmigos(string id, AmigosRelacionados amigosRelacionados)
+        [HttpPost("amigos")]
+        public async Task<ActionResult> PostAmigos(AmigosRelacionados amigosRelacionados)
         {
             List<Amigo> amigos = await _context.Amigos.Where(x => amigosRelacionados.AmigosRelacionadosIds.Contains(x.Id)).ToListAsync();
             
-            Amigo amigo = await _context.Amigos.FindAsync(id);
+            Amigo amigo = await _context.Amigos.FindAsync(amigosRelacionados.Amigo.Id);
             amigo.AmigosRelacionados = amigos;
 
             _context.Update(amigo);

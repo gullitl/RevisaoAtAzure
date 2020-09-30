@@ -5,61 +5,35 @@
     "sobrenome": "Curry",
     "email": "steph@nba.com",
     "telefone": "55 47 98246973",
-    "dataNascimento": "2020-09-16T00:00:00",
-    "paisId": null,
-    "estadoId": null,
-    "foto": "lkjnfkkjnaka7894p2u-afgafjp9u8fja;",
-    "amigos": [
-      {
-        "id": "a0fb4eb7-acca-4cd0-835d-7696b8b71eb5",
-        "nome": "Randy",
-        "sobrenome": "Orton",
-        "email": "randy@wwe.com",
-        "telefone": "55 47 98246973",
-        "dataNascimento": "2020-09-16T00:00:00",
-        "paisId": null,
-        "estadoId": null,
-        "foto": "lkjnfkkjnaka7894p2u-afgahjfjp9u8fja;",
-        "amigos": null
-      },
-      {
-        "id": "cbe53f24-b3d6-434f-a85b-574971a34c14",
-        "nome": "Israel",
-        "sobrenome": "Israel",
-        "email": "isra@ufc.com",
-        "telefone": "55 47 98246973",
-        "dataNascimento": "2020-09-16T00:00:00",
-        "paisId": null,
-        "estadoId": null,
-        "foto": "lkjnfkkjnaka7894p2u-afgafjp9u8fja;",
-        "amigos": null
-      }
-    ]
+    "dataNascimento": "0001-01-01T00:00:00",
+    "paisId": "a593fbc1-6df1-4133-87a0-90f1a3e8cb9c",
+    "estadoId": "0949bca6-6469-46a5-831d-cdb2b9cc2a68",
+    "foto": "https://hortananuvem.blob.core.windows.net/post-images/bd44f644-9080-46de-8a57-79b35b84d143",
+    "amigosRelacionados": null
+  },
+  {
+    "id": "933a42eb-b836-47d5-a7ba-8da9c1853f0f",
+    "nome": "Antonio",
+    "sobrenome": "Banderas",
+    "email": "antonio@hollywood.com",
+    "telefone": "570 83678 94",
+    "dataNascimento": "0001-01-01T00:00:00",
+    "paisId": "21a62f20-8101-4a99-8425-172bb3eeacd6",
+    "estadoId": "123339da-a2ef-419a-ad0a-cafdf894034b",
+    "foto": "https://hortananuvem.blob.core.windows.net/post-images/9a363097-01b0-4d41-bae5-1c3785e51eab",
+    "amigosRelacionados": null
   },
   {
     "id": "9e721e3b-9d38-49d7-ac76-e37334507c7b",
     "nome": "Ronaldinho",
     "sobrenome": "Gaucho",
     "email": "bruxo@fifa.com",
-    "telefone": "55 47 98246973",
-    "dataNascimento": "2020-09-16T00:00:00",
-    "paisId": null,
-    "estadoId": null,
-    "foto": "lkjnfkkjnaka7894p2u-afgahjfjp9u8fja;",
-    "amigos": [
-      {
-        "id": "1c8db2f6-f83f-462f-aec0-171b7995ed94",
-        "nome": "Stephen",
-        "sobrenome": "Curry",
-        "email": "steph@nba.com",
-        "telefone": "55 47 98246973",
-        "dataNascimento": "2020-09-16T00:00:00",
-        "paisId": null,
-        "estadoId": null,
-        "foto": "lkjnfkkjnaka7894p2u-afgafjp9u8fja;",
-        "amigos": null
-      }
-    ]
+    "telefone": "570 83678 94",
+    "dataNascimento": "0001-01-01T00:00:00",
+    "paisId": "25ab59e1-cacb-493c-91cd-8f94279b081e",
+    "estadoId": "503d28ef-4143-4f16-af50-2d217f3ec604",
+    "foto": "https://hortananuvem.blob.core.windows.net/post-images/1dc7bbc4-0198-4149-b017-e740ff24bff7",
+    "amigosRelacionados": null
   },
   {
     "id": "a0fb4eb7-acca-4cd0-835d-7696b8b71eb5",
@@ -67,20 +41,22 @@
     "sobrenome": "Orton",
     "email": "randy@wwe.com",
     "telefone": "55 47 98246973",
-    "dataNascimento": "2020-09-16T00:00:00",
-    "paisId": null,
-    "estadoId": null,
-    "foto": "lkjnfkkjnaka7894p2u-afgahjfjp9u8fja;"
+    "dataNascimento": "0001-01-01T00:00:00",
+    "paisId": "a593fbc1-6df1-4133-87a0-90f1a3e8cb9c",
+    "estadoId": "86035a61-5a10-45fd-896f-3e8eafd43230",
+    "foto": "https://hortananuvem.blob.core.windows.net/post-images/d0a2680d-5bed-4686-a2f0-65d4caa91e41",
+    "amigosRelacionados": null
   },
   {
     "id": "cbe53f24-b3d6-434f-a85b-574971a34c14",
     "nome": "Israel",
-    "sobrenome": "Israel",
+    "sobrenome": "Adesanya",
     "email": "isra@ufc.com",
     "telefone": "55 47 98246973",
-    "dataNascimento": "2020-09-16T00:00:00",
-    "paisId": null,
-    "estadoId": null,
-    "foto": "lkjnfkkjnaka7894p2u-afgafjp9u8fja;"
+    "dataNascimento": "0001-01-01T00:00:00",
+    "paisId": "21a62f20-8101-4a99-8425-172bb3eeacd6",
+    "estadoId": "2a4c598b-e2ce-47e3-b263-e1c27bf73660",
+    "foto": "https://hortananuvem.blob.core.windows.net/post-images/bcd35ce0-9645-49d2-817c-835bc755d91a",
+    "amigosRelacionados": null
   }
 ]

@@ -1,0 +1,26 @@
+[
+  {
+    "amigo": {
+      "id": "1c8db2f6-f83f-462f-aec0-171b7995ed94"
+    },
+    "amigosRelacionadosIds": [
+      "a0fb4eb7-acca-4cd0-835d-7696b8b71eb5",
+      "cbe53f24-b3d6-434f-a85b-574971a34c14"
+    ]
+  },
+  {
+    "amigo": {
+      "id": "933a42eb-b836-47d5-a7ba-8da9c1853f0f"
+    },
+    "amigosRelacionadosIds": [
+      "9e721e3b-9d38-49d7-ac76-e37334507c7b",
+      "a0fb4eb7-acca-4cd0-835d-7696b8b71eb5"
+    ]
+  },
+  {
+    "amigo": {
+      "id": "9e721e3b-9d38-49d7-ac76-e37334507c7b"
+    },
+    "amigosRelacionadosIds": [ "1c8db2f6-f83f-462f-aec0-171b7995ed94" ]
+  }
+]

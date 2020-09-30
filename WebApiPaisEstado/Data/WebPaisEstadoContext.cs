@@ -2,16 +2,16 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
-using WebPaisEstado.Models;
+using WebApiPaisEstado.Models;
 
-namespace WebPaisEstado.Data
+namespace WebApiPaisEstado.Data
 {
     public class WebPaisEstadoContext : DbContext
     {
         public WebPaisEstadoContext (DbContextOptions<WebPaisEstadoContext> options)
             : base(options)
         {
-            Database.EnsureCreated();
+            Database.EnsureCreatedAsync();
         }
         public IEnumerable<Pais> GetPaisSnapshot()
         {

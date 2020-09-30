@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using WebPaisEstado.Data;
-using WebPaisEstado.Models;
+using WebApiPaisEstado.Data;
+using WebApiPaisEstado.Models;
 
-namespace WebPaisEstado.Controllers
+namespace WebApiPaisEstado.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
