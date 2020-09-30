@@ -1,4 +1,4 @@
-﻿@model WebApp.Models.Amigo.RelacionarAmigosViewModel
+﻿@model WebApp.Models.Amigo.AmigosRelacionadosView
 
 @{
     ViewData["Title"] = "RelacionarAmigos";
@@ -8,8 +8,9 @@
 <hr />
 <br />
 <p>
-    Nome: @Model.Amigo?.Nome<br />
-    Email: @Model.Amigo?.Email
+    Nome:    @Model.Amigo?.Nome @Model.Amigo?.Sobrenome
+    <br />
+    Email:   @Model.Amigo?.Email
 </p>
 
 <form action="/amigo/relacionaramigos" method="post">
@@ -17,7 +18,7 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Amigo?</th>
+                <th>Amigo</th>
                 <th>Nome</th>
                 <th>Email</th>
             </tr>
@@ -27,13 +28,12 @@
             {
                 <tr>
                     <td>
-                        @if(Model.AmigosRelacionados.Contains(item.Id))
+                        @if(Model.AmigosRelacionadosIds.Contains(item.Id))
                         {
-                            <input type="checkbox" name="AmigosRelacionados[]" value="@item.Id" checked />
-                        } 
-                        else
+                            <input type="checkbox" name="AmigosRelacionadosIds[]" value="@item.Id" checked />
+                        } else
                         {
-                            <input type="checkbox" name="AmigosRelacionados[]" value="@item.Id" />
+                            <input type="checkbox" name="AmigosRelacionadosIds[]" value="@item.Id" />
                         }
                     </td>
                     <td>@item.Nome</td>
@@ -43,9 +43,6 @@
         </tbody>
     </table>
     <div class="form-group">
-        <input type="submit" value="Relacionar" class="btn btn-primary" />
-    </div>
-    <div>
-        <a asp-action="Index">Listar</a>
+        <input type="submit" value="Relacionar" class="btn btn-primary" /> | <a asp-action="Index">Listar</a>
     </div>
 </form>

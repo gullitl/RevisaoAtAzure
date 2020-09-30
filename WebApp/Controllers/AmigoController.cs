@@ -76,19 +76,17 @@ namespace WebApp.Controllers
                 } else
                     return NotFound();
 
-
             } else
                 return NotFound();
         }
 
-        private async Task<List<AmigoViewModel>> ObterTodosOsAmigos()
+        private async Task<IEnumerable<AmigoView>> ObterTodosOsAmigos()
         {
-            var response = await _httpClientAmigo.GetAsync("");
-
-            var content = await response.Content.ReadAsStringAsync();
-
-            var amigos = JsonConvert.DeserializeObject<List<AmigoViewModel>>(content);
-            return amigos;
+            HttpResponseMessage responseAmigo = await _httpClientAmigo.GetAsync("");
+            if(responseAmigo.IsSuccessStatusCode)
+                return await responseAmigo.Content.ReadAsAsync<IEnumerable<AmigoView>>();
+            
+            return null;
         }
 
         // GET: Amigo/Details/5
@@ -103,20 +101,14 @@ namespace WebApp.Controllers
                 AmigoView amigo = await responseAmigo.Content.ReadAsAsync<AmigoView>();
                 if(amigo == null)
                     return NotFound();
-
-                if(amigo.PaisId != null)
-                {
-                    HttpResponseMessage responsePais = await _httpClientPaisEstado.GetAsync($"pais/{amigo.PaisId}");
-                    if(responsePais.IsSuccessStatusCode)
-                        amigo.Pais = await responsePais.Content.ReadAsAsync<PaisView>();
-                }
-
-                if(amigo.EstadoId != null)
-                {
-                    HttpResponseMessage responseEstado = await _httpClientPaisEstado.GetAsync($"estado/{amigo.EstadoId}");
-                    if(responseEstado.IsSuccessStatusCode)
-                        amigo.Estado = await responseEstado.Content.ReadAsAsync<EstadoView>();
-                }
+              
+                HttpResponseMessage responsePais = await _httpClientPaisEstado.GetAsync($"pais/{amigo.PaisId}");
+                if(responsePais.IsSuccessStatusCode)
+                    amigo.Pais = await responsePais.Content.ReadAsAsync<PaisView>();
+                
+                HttpResponseMessage responseEstado = await _httpClientPaisEstado.GetAsync($"estado/{amigo.EstadoId}");
+                if(responseEstado.IsSuccessStatusCode)
+                    amigo.Estado = await responseEstado.Content.ReadAsAsync<EstadoView>();
 
                 return View(amigo);
 
@@ -273,37 +265,28 @@ namespace WebApp.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult> RelacionarAmigos([FromRoute] int id)
+        public async Task<ActionResult> RelacionarAmigos([FromRoute] string id)
         {
-            var viewModel = new RelacionarAmigosViewModel();
+            HttpResponseMessage responseAmigo = await _httpClientAmigo.GetAsync($"{id}/amigos");
+            if(responseAmigo.IsSuccessStatusCode)
+            {
+                AmigosRelacionadosView viewModel = await responseAmigo.Content.ReadAsAsync<AmigosRelacionadosView>();
+                viewModel.AmigosRelacionadosIds = viewModel.Amigo.AmigosRelacionados.Select(x => x.Id).ToList();
+                return View(viewModel);
+            }
 
-            HttpResponseMessage response = await _httpClientAmigo.GetAsync($"{id}/amigos");
-
-            string content = await response.Content.ReadAsStringAsync();
-
-            viewModel.TodosAmigos = await ObterTodosOsAmigos();
-
-            viewModel.Amigo = viewModel.TodosAmigos.First(x => x.Id == id);
-
-            viewModel.TodosAmigos.Remove(viewModel.Amigo);
-
-            var amigosRelacionados = JsonConvert.DeserializeObject<List<AmigoViewModel>>(content).Select(x => x.Id);
-
-            viewModel.AmigosRelacionados = amigosRelacionados.ToList();
-
-            return View(viewModel);
+            return NotFound();
         }
 
         [HttpPost]
-        public async Task<ActionResult> RelacionarAmigos([FromForm]RelacionarAmigosViewModel form)
+        public async Task<ActionResult> RelacionarAmigos([FromForm]AmigosRelacionadosView form)
         {
-            var amigosJson = JsonConvert.SerializeObject(form);
+            HttpResponseMessage result = await _httpClientAmigo.PostAsJsonAsync($"{form.Amigo.Id}/amigos", new { form.AmigosRelacionadosIds });
 
-            var stringContent = new StringContent(amigosJson, Encoding.UTF8, "application/json");
+            if(result.IsSuccessStatusCode)
+                return RedirectToAction(nameof(RelacionarAmigos), new { form.Amigo.Id });
 
-            await _httpClientAmigo.PostAsync($"{form.Amigo.Id}/amigos", stringContent);
-
-            return RedirectToAction(nameof(RelacionarAmigos), new { form.Amigo.Id });
+            return NotFound();
         }
 
         private async Task<bool> AmigoExists(string id)

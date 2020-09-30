@@ -4,6 +4,6 @@ namespace WebApiAmigo.Models
 {
     public class AmigosRelacionados
     {
-        public List<string> AmigosId { get; set; }
+        public List<string> AmigosRelacionadosIds { get; set; }
     }
 }

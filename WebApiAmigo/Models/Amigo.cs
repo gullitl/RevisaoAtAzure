@@ -14,7 +14,7 @@ namespace WebApiAmigo.Models
         public string PaisId { get; set; }
         public string EstadoId { get; set; }
         public string Foto { get; set; }
-        public List<Amigo> Amigos { get; set; }
+        public List<Amigo> AmigosRelacionados { get; set; }
 
     }
 }

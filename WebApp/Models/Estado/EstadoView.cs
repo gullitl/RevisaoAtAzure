@@ -24,6 +24,8 @@ namespace WebApp.Models.Estado
         public string PaisId { get; set; }
         
         [JsonIgnore]
+        [Required(ErrorMessage = "Campo Bandeira obrigatório.")]
+        [DisplayName("Bandeira")]
         public IFormFile LogoFile { get; set; }
 
         [DisplayName("Bandeira")]

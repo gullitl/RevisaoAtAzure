@@ -110,17 +110,22 @@ namespace WebApiAmigo.Controllers
         [HttpGet("{id}/amigos")]
         public ActionResult GetAmigos(string id)
         {
-            Amigo amigo = _context.Amigos.Where(x => x.Id == id).Include(x => x.Amigos).FirstOrDefaultAsync().Result;
-            return Ok(amigo);
+            var amigoEAmigosRelacionados = new
+            {
+                Amigo = _context.Amigos.Where(x => x.Id == id).Include(x => x.AmigosRelacionados).FirstOrDefaultAsync().Result,
+                TodosAmigos = _context.Amigos.Where(x => x.Id != id).ToListAsync().Result
+            };
+
+            return Ok(amigoEAmigosRelacionados);
         }
 
         [HttpPost("{id}/amigos")]
         public async Task<ActionResult> PostAmigos(string id, AmigosRelacionados amigosRelacionados)
         {
-            List<Amigo> amigos = await _context.Amigos.Where(x => amigosRelacionados.AmigosId.Contains(x.Id)).ToListAsync();
+            List<Amigo> amigos = await _context.Amigos.Where(x => amigosRelacionados.AmigosRelacionadosIds.Contains(x.Id)).ToListAsync();
             
             Amigo amigo = await _context.Amigos.FindAsync(id);
-            amigo.Amigos = amigos;
+            amigo.AmigosRelacionados = amigos;
 
             _context.Update(amigo);
             await _context.SaveChangesAsync();
