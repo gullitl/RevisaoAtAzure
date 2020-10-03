@@ -23,14 +23,14 @@
             <th>
                 @Html.DisplayNameFor(model => model.Pais)
             </th>
-            <th></th>
+            <th>Ações</th>
         </tr>
     </thead>
     <tbody>
         @foreach(var item in Model) {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.FotoBandeira)
+                    <img src="@Html.DisplayFor(modelItem => item.FotoBandeira)" style="width:85px; height:85px" ; />
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Nome)

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using WebApiPaisEstado.Data;
 using WebApiPaisEstado.Models;
@@ -18,20 +19,9 @@ namespace WebApiPaisEstado.Controllers
 
         // GET: api/pais/init
         [HttpGet("init")]
-        public async Task<string> Init()
+        public IEnumerable<Pais> Init()
         {
-            if(!await _context.Paises.AnyAsync())
-            {
-                IEnumerable<Pais> paissnapshot = _context.GetPaisSnapshot();
-                _context.Paises.AddRange(paissnapshot);
-
-                IEnumerable<Estado> estadonapshot = _context.GetEstadoSnapshot();
-                _context.Estados.AddRange(estadonapshot);
-
-                _context.SaveChanges();
-            }
-
-            return "Iniciou WebApiPaisEstado";
+            return _context.Paises.FromSqlInterpolated($"EXECUTE dbo.BuscarPaises").ToList();
         }
 
         // GET: api/pais

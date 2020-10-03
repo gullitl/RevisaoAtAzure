@@ -44,19 +44,8 @@ namespace WebApiAmigo.Controllers
                     return amigo;
                 });
 
-
-
-
-                //List<Amigo> amigos = await _context.Amigos.Where(x => amigosRelacionados.AmigosRelacionadosIds.Contains(x.Id)).ToListAsync();
-
-                //Amigo amigo = await _context.Amigos.FindAsync(id);
-                //amigo.AmigosRelacionados = amigos;
-
                 _context.UpdateRange(amigos);
                 await _context.SaveChangesAsync();
-
-
-
 
             }
 
@@ -64,8 +53,11 @@ namespace WebApiAmigo.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Amigo>>> Get() => Ok(await _context.Amigos.ToListAsync());
-
+        public async Task<ActionResult<IEnumerable<Amigo>>> Get()
+        {
+            var teste = await _context.Amigos.ToListAsync();
+            return Ok(teste);
+        }
         // GET api/amigo/5
         [HttpGet("{id}")]
         public async Task<ActionResult> Get(string id) 

@@ -30,7 +30,7 @@ namespace WebApiAmigo
             );
 
             services.AddDbContext<WebApiAmigoContext>(options =>
-                    options.UseMySQL(Configuration.GetConnectionString("WebApiAmigo")));
+                    options.UseSqlServer(Configuration.GetConnectionString("WebApiAmigo")));
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         }

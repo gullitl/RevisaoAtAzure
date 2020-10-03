@@ -28,7 +28,7 @@ namespace WebApiPaisEstado
             );
 
             services.AddDbContext<WebPaisEstadoContext>(options =>
-                    options.UseMySQL(Configuration.GetConnectionString("WebApiPaisEstado")));
+                    options.UseSqlServer(Configuration.GetConnectionString("WebApiPaisEstado")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
