@@ -12,11 +12,9 @@ namespace WebApiPaisEstado.Controllers
     public class PaisController : ControllerBase
     {
         private readonly IPaisRepository _repository;
-        WebPaisEstadoContext _context;
 
-        public PaisController(IPaisRepository repository, WebPaisEstadoContext context) 
+        public PaisController(IPaisRepository repository) 
         {
-            _context = context;
             _repository = repository;
         }
 

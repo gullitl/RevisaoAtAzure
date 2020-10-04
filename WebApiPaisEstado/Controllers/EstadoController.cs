@@ -12,19 +12,22 @@ namespace WebApiPaisEstado.Controllers
     [ApiController]
     public class EstadoController : ControllerBase
     {
-        private readonly WebPaisEstadoContext _context;
+        private readonly IEstadoRepository _repository;
 
-        public EstadoController(WebPaisEstadoContext context) => _context = context;
+        public EstadoController(IEstadoRepository repository)
+        {
+            _repository = repository;
+        }
 
         // GET: api/estado
         [HttpGet()]
-        public async Task<ActionResult<IEnumerable<Estado>>> Get() => Ok(await _context.Estados.ToListAsync());
+        public ActionResult<IEnumerable<Estado>> Get() => Ok(_repository.BuscarEstados());
 
         // GET: api/estado/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Estado>> Get(string id)
+        public ActionResult<Estado> Get(string id)
         {
-            Estado estado = await _context.Estados.FindAsync(id);
+            Estado estado = _repository.ObterEstado(id);
 
             if (estado == null)
                 return NotFound();
@@ -36,17 +39,16 @@ namespace WebApiPaisEstado.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public async Task<ActionResult<Estado>> Post(Estado estado)
+        public ActionResult<Estado> Post(Estado estado)
         {
             estado.Id = Guid.NewGuid().ToString();
-            _context.Estados.Add(estado);
             try
             {
-                await _context.SaveChangesAsync();
+                _repository.AdicionarEstado(estado);
                 return CreatedAtAction("Get", new { id = estado.Id }, estado);
             } catch(DbUpdateException)
             {
-                if(await EstadoExists(estado.Id))
+                if(EstadoExists(estado.Id))
                     return Conflict();
                 else
                     throw;
@@ -60,16 +62,14 @@ namespace WebApiPaisEstado.Controllers
         [HttpPut]
         public async Task<IActionResult> Put(Estado estado)
         {
-            _context.Entry(estado).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                _repository.EditarEstado(estado);
                 return CreatedAtAction("Get", new { id = estado.Id }, estado);
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!await EstadoExists(estado.Id))
+                if (!EstadoExists(estado.Id))
                     return NotFound();
                 else
                     throw;
@@ -79,21 +79,20 @@ namespace WebApiPaisEstado.Controllers
 
         // DELETE: api/estado/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Estado>> Delete(string id)
+        public ActionResult<Estado> Delete(string id)
         {
-            Estado estado = await _context.Estados.FindAsync(id);
+            Estado estado = _repository.ObterEstado(id);
 
             if (estado == null)
                 return NotFound();
 
-            _context.Estados.Remove(estado);
-            await _context.SaveChangesAsync();
+            _repository.ExcluirEstado(estado.Id);
 
             return Ok(estado);
         }
 
         // GET: api/estado/5/exists
         [HttpGet("{id}/exists")]
-        public async Task<bool> EstadoExists(string id) => await _context.Estados.AnyAsync(e => e.Id == id);
+        public bool EstadoExists(string id) => _repository.ObterEstado(id) != null;
     }
 }
