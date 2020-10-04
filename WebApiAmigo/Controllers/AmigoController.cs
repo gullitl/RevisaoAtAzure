@@ -42,7 +42,7 @@ namespace WebApiAmigo.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public async Task<ActionResult<Amigo>> Post(Amigo amigo)
+        public ActionResult<Amigo> Post(Amigo amigo)
         {
             amigo.Id = Guid.NewGuid().ToString();
             try
