@@ -1,34 +1,35 @@
 ﻿using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using WebApiPaisEstado.Models;
+using WebApiAmigo.Models;
 
-namespace WebApiPaisEstado.Data
+namespace WebApiAmigo.Data
 {
-    public interface IEstadoRepository 
+    public interface IAmigoRepository 
     {
-        IEnumerable<Estado> BuscarEstados();
-        Estado ObterEstado(string id);
-        bool AdicionarEstado(Estado estado);
-        bool EditarEstado(Estado estado);
-        bool ExcluirEstado(string id);
+        IEnumerable<Amigo> BuscarAmigos();
+        Amigo ObterAmigo(string id);
+        bool AdicionarAmigo(Amigo amigo);
+        bool EditarAmigo(Amigo amigo);
+        bool ExcluirAmigo(string id);
     }
-    public class EstadoRepository : IEstadoRepository
+    public class AmigoRepository : IAmigoRepository
     {
         public IConfiguration Configuration { get; }
 
-        public EstadoRepository(IConfiguration configuration)
+        public AmigoRepository(IConfiguration configuration)
         {
             Configuration = configuration;
         }
 
-        public IEnumerable<Estado> BuscarEstados()
+        public IEnumerable<Amigo> BuscarAmigos()
         {
-            var estados = new List<Estado>();
+            var estados = new List<Amigo>();
 
-            using (var connection = new SqlConnection(Configuration["ConnectionStrings:WebApiPaisEstado"]))
+            using (var connection = new SqlConnection(Configuration["ConnectionStrings:WebApiAmigo"]))
             {
-                var procedureName = "BuscarEstados";
+                var procedureName = "BuscarAmigos";
                 var sqlCommand = new SqlCommand(procedureName, connection)
                 {
                     CommandType = System.Data.CommandType.StoredProcedure
@@ -41,15 +42,20 @@ namespace WebApiPaisEstado.Data
                     using var reader = sqlCommand.ExecuteReader(System.Data.CommandBehavior.CloseConnection);
                     while (reader.Read())
                     {
-                        var estado = new Estado
+                        var amigo = new Amigo
                         {
                             Id = reader["id"].ToString(),
                             Nome = reader["nome"].ToString(),
-                            FotoBandeira = reader["fotobandeira"].ToString(),
-                            PaisId = reader["paisid"].ToString()
+                            Sobrenome = reader["sobrenome"].ToString(),
+                            Email = reader["email"].ToString(),
+                            Telefone = reader["telefone"].ToString(),
+                            DataNascimento = DateTime.Parse(reader["datanascimento"].ToString()),
+                            Foto = reader["foto"].ToString(),
+                            PaisId = reader["paisid"].ToString(),
+                            EstadoId = reader["estadoid"].ToString()
                         };
 
-                        estados.Add(estado);
+                        estados.Add(amigo);
                     }
                 }
                 finally
@@ -60,13 +66,13 @@ namespace WebApiPaisEstado.Data
             return estados;
         }
 
-        public Estado ObterEstado(string id)
+        public Amigo ObterAmigo(string id)
         {
-            var estado = new Estado();
+            var amigo = new Amigo();
 
-            using (var connection = new SqlConnection(Configuration["ConnectionStrings:WebApiPaisEstado"]))
+            using (var connection = new SqlConnection(Configuration["ConnectionStrings:WebApiAmigo"]))
             {
-                var procedureName = "ObterEstado";
+                var procedureName = "ObterAmigo";
                 var sqlCommand = new SqlCommand(procedureName, connection)
                 {
                     CommandType = System.Data.CommandType.StoredProcedure
@@ -80,12 +86,17 @@ namespace WebApiPaisEstado.Data
                     using var reader = sqlCommand.ExecuteReader(System.Data.CommandBehavior.CloseConnection);
                     if (reader.Read())
                     {
-                        estado = new Estado
+                        amigo = new Amigo
                         {
                             Id = reader["id"].ToString(),
                             Nome = reader["nome"].ToString(),
-                            FotoBandeira = reader["fotobandeira"].ToString(),
-                            PaisId = reader["paisid"].ToString()
+                            Sobrenome = reader["sobrenome"].ToString(),
+                            Email = reader["email"].ToString(),
+                            Telefone = reader["telefone"].ToString(),
+                            DataNascimento = DateTime.Parse(reader["datanascimento"].ToString()),
+                            Foto = reader["foto"].ToString(),
+                            PaisId = reader["paisid"].ToString(),
+                            EstadoId = reader["estadoid"].ToString()
                         };
                     }
                 }
@@ -94,21 +105,26 @@ namespace WebApiPaisEstado.Data
                     connection.Close();
                 }
             }
-            return estado;
+            return amigo;
         }
 
-        public bool AdicionarEstado(Estado estado)
+        public bool AdicionarAmigo(Amigo amigo)
         {
-            using var connection = new SqlConnection(Configuration["ConnectionStrings:WebApiPaisEstado"]);
-            var procedureName = "AdicionarEstado";
+            using var connection = new SqlConnection(Configuration["ConnectionStrings:WebApiAmigo"]);
+            var procedureName = "AdicionarAmigo";
             var sqlCommand = new SqlCommand(procedureName, connection)
             {
                 CommandType = System.Data.CommandType.StoredProcedure
             };
-            sqlCommand.Parameters.AddWithValue("@Id", estado.Id);
-            sqlCommand.Parameters.AddWithValue("@Nome", estado.Nome);
-            sqlCommand.Parameters.AddWithValue("@FotoBandeira", estado.FotoBandeira);
-            sqlCommand.Parameters.AddWithValue("@PaisId", estado.PaisId);
+            sqlCommand.Parameters.AddWithValue("@Id", amigo.Id);
+            sqlCommand.Parameters.AddWithValue("@Nome", amigo.Nome);
+            sqlCommand.Parameters.AddWithValue("@Sobrenome", amigo.Sobrenome);
+            sqlCommand.Parameters.AddWithValue("@Email", amigo.Email);
+            sqlCommand.Parameters.AddWithValue("@Telefone", amigo.Telefone);
+            sqlCommand.Parameters.AddWithValue("@DataNascimento", amigo.DataNascimento);
+            sqlCommand.Parameters.AddWithValue("@Foto", amigo.Foto);
+            sqlCommand.Parameters.AddWithValue("@PaisId", amigo.PaisId);
+            sqlCommand.Parameters.AddWithValue("@EstadoId", amigo.EstadoId);
 
             try
             {
@@ -123,19 +139,24 @@ namespace WebApiPaisEstado.Data
             }
         }
 
-        public bool EditarEstado(Estado estado)
+        public bool EditarAmigo(Amigo amigo)
         {
 
-            using var connection = new SqlConnection(Configuration["ConnectionStrings:WebApiPaisEstado"]);
-            var procedureName = "EditarEstado";
+            using var connection = new SqlConnection(Configuration["ConnectionStrings:WebApiAmigo"]);
+            var procedureName = "EditarAmigo";
             var sqlCommand = new SqlCommand(procedureName, connection)
             {
                 CommandType = System.Data.CommandType.StoredProcedure
             };
-            sqlCommand.Parameters.AddWithValue("@Id", estado.Id);
-            sqlCommand.Parameters.AddWithValue("@Nome", estado.Nome);
-            sqlCommand.Parameters.AddWithValue("@FotoBandeira", estado.FotoBandeira);
-            sqlCommand.Parameters.AddWithValue("@PaisId", estado.PaisId);
+            sqlCommand.Parameters.AddWithValue("@Id", amigo.Id);
+            sqlCommand.Parameters.AddWithValue("@Nome", amigo.Nome);
+            sqlCommand.Parameters.AddWithValue("@Sobrenome", amigo.Sobrenome);
+            sqlCommand.Parameters.AddWithValue("@Email", amigo.Email);
+            sqlCommand.Parameters.AddWithValue("@Telefone", amigo.Telefone);
+            sqlCommand.Parameters.AddWithValue("@DataNascimento", amigo.DataNascimento);
+            sqlCommand.Parameters.AddWithValue("@Foto", amigo.Foto);
+            sqlCommand.Parameters.AddWithValue("@PaisId", amigo.PaisId);
+            sqlCommand.Parameters.AddWithValue("@EstadoId", amigo.EstadoId);
 
             try
             {
@@ -150,10 +171,10 @@ namespace WebApiPaisEstado.Data
             }
         }
 
-        public bool ExcluirEstado(string id)
+        public bool ExcluirAmigo(string id)
         {
-            using var connection = new SqlConnection(Configuration["ConnectionStrings:WebApiPaisEstado"]);
-            var procedureName = "ExcluirEstado";
+            using var connection = new SqlConnection(Configuration["ConnectionStrings:WebApiAmigo"]);
+            var procedureName = "ExcluirAmigo";
             var sqlCommand = new SqlCommand(procedureName, connection)
             {
                 CommandType = System.Data.CommandType.StoredProcedure
