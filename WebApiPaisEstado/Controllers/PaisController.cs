@@ -20,10 +20,7 @@ namespace WebApiPaisEstado.Controllers
 
         // GET: api/pais/init
         [HttpGet("init")]
-        public IEnumerable<Pais> Init()
-        {
-            return null;
-        }
+        public string Init() => "Iniciou WebApiPaisEstado";
 
         // GET: api/pais
         [HttpGet]

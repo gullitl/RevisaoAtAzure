@@ -1,9 +1,7 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using WebApiAmigo.Data;
 using WebApiAmigo.Models;
@@ -14,55 +12,25 @@ namespace WebApiAmigo.Controllers
     [ApiController]
     public class AmigoController : ControllerBase
     {
-        public IMapper Mapper { get; }
-        public readonly WebApiAmigoContext _context;
+        private readonly IAmigoRepository _repository;
 
-        public AmigoController(IMapper mapper, WebApiAmigoContext context)
+        public AmigoController(IAmigoRepository repository)
         {
-            Mapper = mapper;
-            _context = context;
+            _repository = repository;
         }
 
         // GET: api/amigo/init
         [HttpGet("init")]
-        public async Task<string> Init()
-        {
-            if(!await _context.Amigos.AnyAsync())
-            {
-                IEnumerable<Amigo> amigosnapshot = _context.GetAmigoSnapshot();
-                _context.Amigos.AddRange(amigosnapshot);
-                await _context.SaveChangesAsync();
-
-
-                IEnumerable<AmigosRelacionados> amigosrelacionadosnapshot = _context.GetAmigosRelacionadosSnapshot();
-
-                var amigos = amigosrelacionadosnapshot.ToList().Select(ar =>
-                {
-                    List<Amigo> amigos = _context.Amigos.Where(x => ar.AmigosRelacionadosIds.Contains(x.Id)).ToListAsync().Result;
-                    Amigo amigo = _context.Amigos.FindAsync(ar.Amigo.Id).Result;
-                    amigo.AmigosRelacionados = amigos;
-                    return amigo;
-                });
-
-                _context.UpdateRange(amigos);
-                await _context.SaveChangesAsync();
-
-            }
-
-            return "Iniciou WebApiAmigo";
-        }
+        public string Init() =>  "Iniciou WebApiAmigo";
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Amigo>>> Get()
-        {
-            var teste = await _context.Amigos.ToListAsync();
-            return Ok(teste);
-        }
+        public ActionResult<IEnumerable<Amigo>> Get() => Ok(_repository.BuscarAmigos());
+        
         // GET api/amigo/5
         [HttpGet("{id}")]
-        public async Task<ActionResult> Get(string id) 
+        public ActionResult Get(string id) 
         {
-            Amigo amigo = await _context.Amigos.FindAsync(id);
+            Amigo amigo = _repository.ObterAmigo(id);
 
             if(amigo == null)
                 return NotFound();
@@ -77,14 +45,13 @@ namespace WebApiAmigo.Controllers
         public async Task<ActionResult<Amigo>> Post(Amigo amigo)
         {
             amigo.Id = Guid.NewGuid().ToString();
-            _context.Amigos.Add(amigo);
             try
             {
-                await _context.SaveChangesAsync();
+                _repository.AdicionarAmigo(amigo);
                 return CreatedAtAction("Get", new { id = amigo.Id });
             } catch(DbUpdateException)
             {
-                if(await AmigoExists(amigo.Id))
+                if(AmigoExists(amigo.Id))
                     return Conflict();
                 else
                     throw;
@@ -93,17 +60,15 @@ namespace WebApiAmigo.Controllers
 
         // PUT api/amigo
         [HttpPut]
-        public async Task<IActionResult> Put(Amigo amigo)
+        public IActionResult Put(Amigo amigo)
         {
-            _context.Entry(amigo).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                _repository.EditarAmigo(amigo);
                 return CreatedAtAction("Get", new { id = amigo.Id });
             } catch(DbUpdateConcurrencyException)
             {
-                if(!await AmigoExists(amigo.Id))
+                if(!AmigoExists(amigo.Id))
                     return NotFound();
                 else
                     throw;
@@ -112,15 +77,14 @@ namespace WebApiAmigo.Controllers
 
         // DELETE api/amigo/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Amigo>> Delete(string id)
+        public ActionResult<Amigo> Delete(string id)
         {
-            Amigo amigo = await _context.Amigos.FindAsync(id);
+            Amigo amigo = _repository.ObterAmigo(id);
 
-            if(amigo == null)
+            if (amigo == null)
                 return NotFound();
 
-            _context.Amigos.Remove(amigo);
-            await _context.SaveChangesAsync();
+            _repository.ExcluirAmigo(amigo.Id);
 
             return Ok(amigo);
         }
@@ -128,33 +92,20 @@ namespace WebApiAmigo.Controllers
         [HttpGet("{id}/amigos")]
         public ActionResult GetAmigos(string id)
         {
-            var amigosRelacionados = new AmigosRelacionados
-            {
-                Amigo = _context.Amigos.Where(x => x.Id == id).Include(x => x.AmigosRelacionados).FirstOrDefaultAsync().Result,
-                TodosAmigos = _context.Amigos.Where(x => x.Id != id).ToListAsync().Result
-            };
-            amigosRelacionados.AmigosRelacionadosIds = amigosRelacionados.Amigo.AmigosRelacionados.Select(x => x.Id).ToList();
+            var amigosRelacionados = _repository.ObterAmigosRelacionados(id);
 
             return Ok(amigosRelacionados);
         }
 
         [HttpPost("amigos")]
-        public async Task<ActionResult> PostAmigos(AmigosRelacionados amigosRelacionados)
+        public ActionResult PostAmigos(AmigosRelacionados amigosRelacionados)
         {
-            List<Amigo> amigos = await _context.Amigos.Where(x => amigosRelacionados.AmigosRelacionadosIds.Contains(x.Id)).ToListAsync();
-            
-            Amigo amigo = await _context.Amigos.FindAsync(amigosRelacionados.Amigo.Id);
-            amigo.AmigosRelacionados = amigos;
-
-            _context.Update(amigo);
-            await _context.SaveChangesAsync();
-
-            return Ok();
+            return Ok(_repository.AdicionarAmigosRelacionados(amigosRelacionados));
         }
 
         // GET: api/amigo/5/exists
         [HttpGet("{id}/exists")]
-        public async Task<bool> AmigoExists(string id) => await _context.Amigos.AnyAsync(e => e.Id == id);
+        public bool AmigoExists(string id) => _repository.ObterAmigo(id) != null;
     }
 
     

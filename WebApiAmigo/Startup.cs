@@ -29,8 +29,7 @@ namespace WebApiAmigo
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
             );
 
-            services.AddDbContext<WebApiAmigoContext>(options =>
-                    options.UseSqlServer(Configuration.GetConnectionString("WebApiAmigo")));
+            services.AddScoped<IAmigoRepository, AmigoRepository>();
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         }
